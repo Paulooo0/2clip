@@ -1,32 +1,45 @@
 package clip
 
 import (
-	"flag"
 	"fmt"
 	"log"
 
 	"github.com/boltdb/bolt"
+	"github.com/spf13/cobra"
 
 	database "github.com/Paulooo0/2clip/pkg/database"
 )
 
+var getCmd = &cobra.Command{
+	Use:   "get",
+	Short: "Get a value from the database",
+	Long:  `Get a value from the database based on the provided key.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		searchKey := args[0]
+
+		db := database.OpenDatabase()
+
+		populateDatabase(db) // Add test data to the database
+		defer db.Close()
+
+		readValue(db, searchKey)
+	},
+}
+
+var rootCmd = &cobra.Command{
+	Use:   "2clip",
+	Short: "2clip is a simple clipboard manager",
+	Long:  `2clip is a simple CLI tool for managing your clipboard`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("2clip is a simple CLI tool for managing your clipboard")
+	},
+}
+
 func GetValue() {
-	// Define command-line flags
-	key := flag.String("get", "", "The key to search for")
+	getCmd.Flags().String("get", "", "The key to search for")
 
-	// Parse command-line flags
-	flag.Parse()
-
-	// Access the flag value
-	searchKey := *key
-
-	// Open or create the database
-	db := database.OpenDatabase()
-
-	// Populate the database
-	populateDatabase(db)
-
-	readValue(db, searchKey)
+	rootCmd.AddCommand(getCmd)
+	rootCmd.Execute()
 }
 
 func readValue(db *bolt.DB, searchKey string) {
@@ -71,12 +84,3 @@ func populateDatabase(db *bolt.DB) {
 		log.Fatal(err)
 	}
 }
-
-// func cliFlags() []string {
-// 	getFlag := flag.String("get", "", "The key to search for")
-// 	gFlag := flag.String("g", "", "The key to search for")
-// 	emptyFlag := flag.String("", "", "The key to search for")
-
-// 	flag.Parse()
-// 	return []string{*getFlag, *gFlag, *emptyFlag}
-// }
