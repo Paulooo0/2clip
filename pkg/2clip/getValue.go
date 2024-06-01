@@ -7,7 +7,7 @@ import (
 
 	"github.com/boltdb/bolt"
 
-	"github.com/Paulooo0/2clip/pkg/database"
+	database "github.com/Paulooo0/2clip/pkg/database"
 )
 
 func GetValue() {
