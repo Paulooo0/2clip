@@ -1,32 +1,28 @@
 package clip
 
 import (
-	"flag"
 	"fmt"
 	"log"
 
 	"github.com/boltdb/bolt"
+	"github.com/spf13/cobra"
 
 	database "github.com/Paulooo0/2clip/pkg/database"
 )
 
-func GetValue() {
-	// Define command-line flags
-	key := flag.String("get", "", "The key to search for")
+var GetCmd = &cobra.Command{
+	Use:   "get",
+	Short: "Get a value from the database",
+	Long:  `Get a value from the database based on the provided key.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		key := args[0]
 
-	// Parse command-line flags
-	flag.Parse()
+		db := database.OpenDatabase()
 
-	// Access the flag value
-	searchKey := *key
+		defer db.Close()
 
-	// Open or create the database
-	db := database.OpenDatabase()
-
-	// Populate the database
-	populateDatabase(db)
-
-	readValue(db, searchKey)
+		readValue(db, key)
+	},
 }
 
 func readValue(db *bolt.DB, searchKey string) {
@@ -46,37 +42,3 @@ func readValue(db *bolt.DB, searchKey string) {
 		log.Fatal(err)
 	}
 }
-
-func populateDatabase(db *bolt.DB) {
-	err := db.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte("2clip"))
-
-		testData := map[string]string{
-			"key1": "value1",
-			"key2": "value2",
-			"key3": "value3",
-		}
-
-		for key, value := range testData {
-			err := bucket.Put([]byte(key), []byte(value))
-			if err != nil {
-				return err
-			}
-		}
-
-		return nil
-	})
-
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-// func cliFlags() []string {
-// 	getFlag := flag.String("get", "", "The key to search for")
-// 	gFlag := flag.String("g", "", "The key to search for")
-// 	emptyFlag := flag.String("", "", "The key to search for")
-
-// 	flag.Parse()
-// 	return []string{*getFlag, *gFlag, *emptyFlag}
-// }
