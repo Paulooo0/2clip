@@ -110,14 +110,14 @@ func addProtectedToDatabase(db *bolt.DB, key string, value string) {
 }
 
 func overwrite(tx *bolt.Tx, key string) (string, error) {
-	if checkKeyAlreadyExists(tx, key) {
+	if util.CheckKeyAlreadyExists(key, tx, "2clip") {
 		fmt.Printf(`key '%s' already exists, you want to overwrite it? [Y/N]: `, key)
 
 		getOverwriteAnswer()
 
 		return key, nil
 	}
-	if checkKeyAlreadyExists(tx, key+" (protected)") {
+	if util.CheckKeyAlreadyExists(key+" (protected)", tx, "2clip") {
 		fmt.Printf(`key '%s' already exists, you want to overwrite it? [Y/N]: `, key)
 
 		getOverwriteAnswer()
@@ -130,18 +130,6 @@ func overwrite(tx *bolt.Tx, key string) (string, error) {
 		return key, nil
 	}
 	return key, nil
-}
-
-func checkKeyAlreadyExists(tx *bolt.Tx, key string) bool {
-	var exists bool
-
-	bucket, err := util.ConnectToBucket(tx, "2clip")
-	if err != nil {
-		log.Fatal(err)
-	}
-	exists = bucket.Get([]byte(key)) != nil
-
-	return exists
 }
 
 func getOverwriteAnswer() {

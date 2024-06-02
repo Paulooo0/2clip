@@ -19,22 +19,46 @@ var AuthCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
 
-		password := authenticate()
-
 		db, _ := database.OpenDatabase("2clip.db", "2clip_password")
 		defer db.Close()
+
+		checkAlreadyHaveAuth(db)
+
+		password := getPassword()
+
+		validateAuth(db, password)
 
 		saveAuthentication(db, password)
 	},
 }
 
-func authenticate() string {
-	password := enterPassword()
-
-	return password
+func validateAuth(db *bolt.DB, password string) {
+	err := db.Update(func(tx *bolt.Tx) error {
+		util.ValidatePassword(tx, password)
+		return nil
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
-func enterPassword() string {
+func checkAlreadyHaveAuth(db *bolt.DB) error {
+	err := db.Update(func(tx *bolt.Tx) error {
+		if util.CheckKeyAlreadyExists("2CLIP_PASSWORD", tx, "2clip_password") {
+			fmt.Println("You already have an authentication")
+			fmt.Println("If want to update your password, run '2clip auth -u'")
+			os.Exit(0)
+		}
+		return nil
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	return nil
+}
+
+func getPassword() string {
 	var password string
 
 	condition := true
@@ -48,7 +72,7 @@ func enterPassword() string {
 		var passwordAgain string
 		fmt.Scanln(&passwordAgain)
 
-		err := checkPassword(password, passwordAgain)
+		err := matchPassword(password, passwordAgain)
 
 		if err != nil {
 			condition = checkAnswer()
@@ -59,7 +83,7 @@ func enterPassword() string {
 	return password
 }
 
-func checkPassword(password1 string, password2 string) error {
+func matchPassword(password1 string, password2 string) error {
 	if password1 != password2 {
 		return fmt.Errorf("passwords do not match")
 	}
