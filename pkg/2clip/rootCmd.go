@@ -1,4 +1,4 @@
-package util
+package clip
 
 import (
 	"fmt"
@@ -12,5 +12,6 @@ var RootCmd = &cobra.Command{
 	Long:  `2clip is a simple CLI tool for managing your clipboard`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("2clip is a simple CLI tool for managing your clipboard")
+		fmt.Println("Run '2clip help' for more information")
 	},
 }
