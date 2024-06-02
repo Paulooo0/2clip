@@ -9,6 +9,7 @@ func main() {
 	util.RootCmd.AddCommand(clip.AddCmd)
 	util.RootCmd.AddCommand(clip.GetCmd)
 	util.RootCmd.AddCommand(clip.RemoveCmd)
+	util.RootCmd.AddCommand(clip.ListKeysCmd)
 
 	util.RootCmd.Execute()
 }
