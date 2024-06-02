@@ -3,6 +3,7 @@ package clip
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/boltdb/bolt"
 	"github.com/spf13/cobra"
@@ -31,26 +32,58 @@ func removeValue(db *bolt.DB, key string) {
 			return err
 		}
 
-		value := bucket.Get([]byte(key + " (protected)"))
-		unprotectedKey := key
-		key := key + " (protected)"
-		if value == nil {
-			key = unprotectedKey
-			value = bucket.Get([]byte(key))
+		key, err := processKey(bucket, key)
+		if err != nil {
+			return err
+		}
 
-			if value == nil {
-				return fmt.Errorf(`key "%s" not found`, key)
-			}
+		err = deleteByKey(tx, bucket, key)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func processKey(bucket *bolt.Bucket, key string) (string, error) {
+	value := bucket.Get([]byte(key + " (protected)"))
+	originalKey := key
+	key = key + " (protected)"
+	if value == nil {
+		key = originalKey
+		value = bucket.Get([]byte(key))
+
+		if value == nil {
+			return "", fmt.Errorf(`key "%s" not found`, key)
+		}
+	}
+	return key, nil
+}
+
+func deleteByKey(tx *bolt.Tx, bucket *bolt.Bucket, key string) error {
+	if strings.HasSuffix(key, " (protected)") {
+		err := util.Authenticate(tx)
+		if err != nil {
+			return err
 		}
 
 		err = bucket.Delete([]byte(key))
 		if err != nil {
 			return err
 		}
-		fmt.Printf(`Removed "%s"`+"\n", key)
+
+		fmt.Printf(`Removed '%s'`+"\n", key)
 		return nil
-	})
-	if err != nil {
-		log.Fatal(err)
+	} else {
+		err := bucket.Delete([]byte(key))
+		if err != nil {
+			return err
+		}
+
+		fmt.Printf(`Removed '%s'`+"\n", key)
+		return nil
 	}
 }
