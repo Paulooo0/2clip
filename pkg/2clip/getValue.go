@@ -3,6 +3,7 @@ package clip
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/atotto/clipboard"
 	"github.com/boltdb/bolt"
@@ -32,17 +33,32 @@ func readValue(db *bolt.DB, key string) {
 		if bucket == nil {
 			return fmt.Errorf("bucket 2clip not found")
 		}
-		value := bucket.Get([]byte(key))
+
+		value := bucket.Get([]byte(key + " (protected)"))
+		keyString := key + " (protected)"
+		if value == nil {
+			value = bucket.Get([]byte(key))
+			keyString = key
+		}
 		if value == nil {
 			return fmt.Errorf(`key "%s" not found`, key)
 		}
 
-		fmt.Println(string(value))
+		if strings.HasSuffix(keyString, " (protected)") {
+			err := clipboard.WriteAll(string(value))
 
-		err := clipboard.WriteAll(string(value))
-		fmt.Println("\nValue copied to clipboard")
-		if err != nil {
-			log.Fatal(err)
+			fmt.Println("Protected value copied to clipboard")
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			fmt.Println(string(value))
+
+			err := clipboard.WriteAll(string(value))
+			fmt.Println("Value copied to clipboard")
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 
 		return nil
