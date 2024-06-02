@@ -3,6 +3,8 @@ package clip
 import (
 	"fmt"
 	"log"
+	"os"
+	"strings"
 
 	"github.com/boltdb/bolt"
 	"github.com/spf13/cobra"
@@ -20,7 +22,7 @@ var AddCmd = &cobra.Command{
 		key := args[0]
 		value := args[1]
 
-		db, _ := database.OpenDatabase("2clip", "2clip")
+		db, _ := database.OpenDatabase("2clip.db", "2clip")
 		defer db.Close()
 
 		if cmd.Flags().Changed("protected") {
@@ -61,12 +63,21 @@ func addToDatabase(db *bolt.DB, key string, value string) {
 			return err
 		}
 
+		key, err = overwrite(tx, key)
+		if err != nil {
+			return err
+		}
+
 		err = bucket.Put([]byte(key), []byte(value))
 		if err != nil {
 			return err
 		}
 
-		fmt.Printf(`Added "%s" with value "%s"`+"\n", key, value)
+		if strings.HasSuffix(key, " (protected)") {
+			fmt.Printf(`Added '%s' with protect value`+"\n", key)
+		} else {
+			fmt.Printf(`Added '%s' with value "%s"`+"\n", key, value)
+		}
 		return nil
 	})
 	if err != nil {
@@ -81,7 +92,12 @@ func addProtectedToDatabase(db *bolt.DB, key string, value string) {
 			return fmt.Errorf("bucket 2clip not found")
 		}
 
-		err := bucket.Put([]byte(key+" (protected)"), []byte(value))
+		key, err := overwrite(tx, key)
+		if err != nil {
+			return err
+		}
+
+		err = bucket.Put([]byte(key+" (protected)"), []byte(value))
 		if err != nil {
 			return err
 		}
@@ -90,5 +106,56 @@ func addProtectedToDatabase(db *bolt.DB, key string, value string) {
 	})
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+func overwrite(tx *bolt.Tx, key string) (string, error) {
+	if checkKeyAlreadyExists(tx, key) {
+		fmt.Printf(`key '%s' already exists, you want to overwrite it? [Y/N]: `, key)
+
+		getOverwriteAnswer()
+
+		return key, nil
+	}
+	if checkKeyAlreadyExists(tx, key+" (protected)") {
+		fmt.Printf(`key '%s' already exists, you want to overwrite it? [Y/N]: `, key)
+
+		getOverwriteAnswer()
+
+		err := util.Authenticate(tx)
+		if err != nil {
+			return "", err
+		}
+		key = key + " (protected)"
+		return key, nil
+	}
+	return key, nil
+}
+
+func checkKeyAlreadyExists(tx *bolt.Tx, key string) bool {
+	var exists bool
+
+	bucket, err := util.ConnectToBucket(tx, "2clip")
+	if err != nil {
+		log.Fatal(err)
+	}
+	exists = bucket.Get([]byte(key)) != nil
+
+	return exists
+}
+
+func getOverwriteAnswer() {
+	answerCondition := true
+	for answerCondition {
+		var answer string
+		fmt.Scanln(&answer)
+		if answer == "N" || answer == "n" {
+			os.Exit(0)
+		} else if answer == "Y" || answer == "y" {
+			answerCondition = false
+		} else {
+			fmt.Print("Invalid answer, please type Y or N: ")
+			answerCondition = true
+		}
 	}
 }

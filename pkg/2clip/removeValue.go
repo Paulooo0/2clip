@@ -18,7 +18,7 @@ var RemoveCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		key := args[0]
-		db, _ := database.OpenDatabase("2clip", "2clip")
+		db, _ := database.OpenDatabase("2clip.db", "2clip")
 		defer db.Close()
 		removeValue(db, key)
 	},

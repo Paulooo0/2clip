@@ -21,7 +21,7 @@ var AuthCmd = &cobra.Command{
 
 		password := authenticate()
 
-		db, _ := database.OpenDatabase("2clip", "2clip_password")
+		db, _ := database.OpenDatabase("2clip.db", "2clip_password")
 		defer db.Close()
 
 		saveAuthentication(db, password)
