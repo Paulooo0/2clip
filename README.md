@@ -2,7 +2,12 @@
 
 2clip is a CLI tool for managing your clipboard, that automatically adds the value of your created keys. Fast, simple and always available.
 
-### Installation
+## Summary
+* [Installation](#installation)
+* [How to use](#how-to-use)
+* [Technologies](#technologies)
+
+<h2 id="installation">Installation</h2>
 
 #### Unix
 
@@ -25,7 +30,8 @@ Run the PowerShell script:
 .\install_2clip.ps1
 ```
 
-## How to use
+<h2 id="how-to-use">How to use</h2>
+
 ### Main commands
 #### add - adds a new key-value pair to the database
 ```bash
@@ -65,7 +71,7 @@ bkey
 2clip remove "My key"
 ```
 
-## Technologies
+<h2 id="technologies">Technologies</h2>
 
 * Golang
 * BoltDB
