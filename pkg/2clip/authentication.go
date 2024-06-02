@@ -69,13 +69,12 @@ func checkPassword(password1 string, password2 string) error {
 func checkAnswer() bool {
 	answerCondition := true
 	for answerCondition {
-		fmt.Print("You want to try again? [Y/N]: ")
+		fmt.Print("\nYou want to try again? [Y/N]: ")
 
 		var answer string
 		fmt.Scanln(&answer)
 		if answer == "N" || answer == "n" {
 			answerCondition = false
-			fmt.Println("\nExiting...")
 			os.Exit(0)
 		} else if answer == "Y" || answer == "y" {
 			answerCondition = true
