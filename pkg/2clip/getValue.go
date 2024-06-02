@@ -17,7 +17,7 @@ var GetCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		key := args[0]
 
-		db := database.OpenDatabase()
+		db, _ := database.OpenDatabase()
 
 		defer db.Close()
 

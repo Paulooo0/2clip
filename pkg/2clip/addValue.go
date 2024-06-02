@@ -19,7 +19,7 @@ var AddCmd = &cobra.Command{
 		key := args[0]
 		value := args[1]
 
-		db := database.OpenDatabase()
+		db, _ := database.OpenDatabase()
 		defer db.Close()
 
 		addToDatabase(db, key, value)

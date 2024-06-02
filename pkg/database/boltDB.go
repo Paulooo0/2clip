@@ -9,13 +9,25 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-func OpenDatabase() *bolt.DB {
-	err := os.MkdirAll("data", 0755)
+func OpenDatabase() (*bolt.DB, error) {
+	// Get the home directory path
+	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		log.Fatal(err)
+		return nil, fmt.Errorf("failed to get home directory: %w", err)
 	}
 
-	dbPath := filepath.Join("data", "2clip_db.db")
+	// Construct the data folder path
+	dataDir := filepath.Join(homeDir, ".2clip", "data")
+
+	// Create the data folder if it doesn't exist
+	err = os.MkdirAll(dataDir, 0700)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create data folder: %w", err)
+	}
+
+	// Construct the database path
+	dbPath := filepath.Join(dataDir, "2clip.db")
+
 	db, err := bolt.Open(dbPath, 0644, nil)
 	if err != nil {
 		log.Fatalf("Failed to open database: %s", err)
@@ -23,7 +35,7 @@ func OpenDatabase() *bolt.DB {
 
 	createBucketIfNotExists(db)
 
-	return db
+	return db, nil
 }
 
 func createBucketIfNotExists(db *bolt.DB) {
