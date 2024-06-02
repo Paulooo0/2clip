@@ -17,7 +17,7 @@ var ListKeysCmd = &cobra.Command{
 	Short: "List all keys in the database",
 	Long:  `List all keys in the database.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		db := database.OpenDatabase()
+		db, _ := database.OpenDatabase()
 		defer db.Close()
 		listKeys(db)
 	},
