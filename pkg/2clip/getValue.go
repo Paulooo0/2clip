@@ -9,6 +9,7 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/spf13/cobra"
 
+	"github.com/Paulooo0/2clip/pkg/2clip/util"
 	database "github.com/Paulooo0/2clip/pkg/database"
 )
 
@@ -29,9 +30,9 @@ var GetCmd = &cobra.Command{
 
 func readValue(db *bolt.DB, key string) {
 	err := db.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte("2clip"))
-		if bucket == nil {
-			return fmt.Errorf("bucket 2clip not found")
+		bucket, err := util.ConnectToBucket(tx)
+		if err != nil {
+			return err
 		}
 
 		value := bucket.Get([]byte(key + " (protected)"))

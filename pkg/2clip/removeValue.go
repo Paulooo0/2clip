@@ -7,6 +7,7 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/spf13/cobra"
 
+	"github.com/Paulooo0/2clip/pkg/2clip/util"
 	"github.com/Paulooo0/2clip/pkg/database"
 )
 
@@ -25,9 +26,9 @@ var RemoveCmd = &cobra.Command{
 
 func removeValue(db *bolt.DB, key string) {
 	err := db.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte("2clip"))
-		if bucket == nil {
-			return fmt.Errorf("bucket 2clip not found")
+		bucket, err := util.ConnectToBucket(tx)
+		if err != nil {
+			return err
 		}
 		value := bucket.Get([]byte(key + " (protected)"))
 		key := key + " (protected)"
@@ -38,7 +39,7 @@ func removeValue(db *bolt.DB, key string) {
 			return fmt.Errorf(`key "%s" not found`, key)
 		}
 
-		err := bucket.Delete([]byte(key))
+		err = bucket.Delete([]byte(key))
 		if err != nil {
 			return err
 		}
