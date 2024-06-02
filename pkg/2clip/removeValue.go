@@ -30,13 +30,17 @@ func removeValue(db *bolt.DB, key string) {
 		if err != nil {
 			return err
 		}
+
 		value := bucket.Get([]byte(key + " (protected)"))
+		unprotectedKey := key
 		key := key + " (protected)"
 		if value == nil {
+			key = unprotectedKey
 			value = bucket.Get([]byte(key))
-		}
-		if value == nil {
-			return fmt.Errorf(`key "%s" not found`, key)
+
+			if value == nil {
+				return fmt.Errorf(`key "%s" not found`, key)
+			}
 		}
 
 		err = bucket.Delete([]byte(key))
