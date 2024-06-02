@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/atotto/clipboard"
 	"github.com/boltdb/bolt"
 	"github.com/spf13/cobra"
 
@@ -35,7 +36,15 @@ func readValue(db *bolt.DB, key string) {
 		if value == nil {
 			return fmt.Errorf(`key "%s" not found`, key)
 		}
+
 		fmt.Println(string(value))
+
+		err := clipboard.WriteAll(string(value))
+		fmt.Println("\nValue copied to clipboard")
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		return nil
 	})
 	if err != nil {
