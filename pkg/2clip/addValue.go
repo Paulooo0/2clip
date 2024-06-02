@@ -37,7 +37,7 @@ func addToDatabase(db *bolt.DB, key string, value string) {
 			return err
 		}
 
-		fmt.Printf("Added %s with value %s\n", key, value)
+		fmt.Printf(`Added "%s" with value "%s"`+"\n", key, value)
 		return nil
 	})
 	if err != nil {

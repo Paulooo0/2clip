@@ -7,26 +7,24 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/spf13/cobra"
 
-	database "github.com/Paulooo0/2clip/pkg/database"
+	"github.com/Paulooo0/2clip/pkg/database"
 )
 
-var GetCmd = &cobra.Command{
-	Use:   "get",
-	Short: "Get a value from the database",
-	Long:  `Get a value from the database based on the provided key.`,
+var RemoveCmd = &cobra.Command{
+	Use:   "remove",
+	Short: "Remove a value from the database",
+	Long:  `Remove a value from the database based on the provided key.`,
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		key := args[0]
-
 		db := database.OpenDatabase()
-
 		defer db.Close()
-
-		readValue(db, key)
+		removeValue(db, key)
 	},
 }
 
-func readValue(db *bolt.DB, key string) {
-	err := db.View(func(tx *bolt.Tx) error {
+func removeValue(db *bolt.DB, key string) {
+	err := db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte("2clip"))
 		if bucket == nil {
 			return fmt.Errorf("bucket 2clip not found")
@@ -35,7 +33,11 @@ func readValue(db *bolt.DB, key string) {
 		if value == nil {
 			return fmt.Errorf(`key "%s" not found`, key)
 		}
-		fmt.Println(string(value))
+		err := bucket.Delete([]byte(key))
+		if err != nil {
+			return err
+		}
+		fmt.Printf(`Removed "%s"`+"\n", key)
 		return nil
 	})
 	if err != nil {
