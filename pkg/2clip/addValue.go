@@ -20,7 +20,7 @@ var AddCmd = &cobra.Command{
 		key := args[0]
 		value := args[1]
 
-		db, _ := database.OpenDatabase()
+		db, _ := database.OpenDatabase("2clip", "2clip")
 		defer db.Close()
 
 		if cmd.Flags().Changed("protected") {
@@ -41,7 +41,7 @@ var AddProtectedCmd = &cobra.Command{
 		key := args[0]
 		value := args[1]
 
-		db, _ := database.OpenDatabase()
+		db, _ := database.OpenDatabase("2clip", "2clip")
 		defer db.Close()
 
 		addProtectedToDatabase(db, key, value)
@@ -56,7 +56,7 @@ func AddCmdFlags() {
 
 func addToDatabase(db *bolt.DB, key string, value string) {
 	err := db.Update(func(tx *bolt.Tx) error {
-		bucket, err := util.ConnectToBucket(tx)
+		bucket, err := util.ConnectToBucket(tx, "2clip")
 		if err != nil {
 			return err
 		}

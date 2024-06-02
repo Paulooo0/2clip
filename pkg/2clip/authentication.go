@@ -2,8 +2,14 @@ package clip
 
 import (
 	"fmt"
+	"log"
+	"os"
 
+	"github.com/boltdb/bolt"
 	"github.com/spf13/cobra"
+
+	"github.com/Paulooo0/2clip/pkg/2clip/util"
+	"github.com/Paulooo0/2clip/pkg/database"
 )
 
 var AuthCmd = &cobra.Command{
@@ -13,14 +19,19 @@ var AuthCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
 
-		authenticate()
+		password := authenticate()
+
+		db, _ := database.OpenDatabase("2clip", "2clip_password")
+		defer db.Close()
+
+		saveAuthentication(db, password)
 	},
 }
 
-func authenticate() error {
-	enterPassword()
+func authenticate() string {
+	password := enterPassword()
 
-	return nil
+	return password
 }
 
 func enterPassword() string {
@@ -28,11 +39,11 @@ func enterPassword() string {
 
 	condition := true
 	for condition {
-		fmt.Println("Enter your password:")
+		fmt.Print("Enter your password: ")
 
 		fmt.Scanln(&password)
 
-		fmt.Println("Enter your password again:")
+		fmt.Print("Enter your password again: ")
 
 		var passwordAgain string
 		fmt.Scanln(&passwordAgain)
@@ -58,14 +69,14 @@ func checkPassword(password1 string, password2 string) error {
 func checkAnswer() bool {
 	answerCondition := true
 	for answerCondition {
-		fmt.Println("You want to try again? [Y/N]")
+		fmt.Print("You want to try again? [Y/N]: ")
 
 		var answer string
 		fmt.Scanln(&answer)
 		if answer == "N" || answer == "n" {
-			fmt.Println("Exiting...")
 			answerCondition = false
-			return false
+			fmt.Println("\nExiting...")
+			os.Exit(0)
 		} else if answer == "Y" || answer == "y" {
 			answerCondition = true
 			return true
@@ -77,3 +88,20 @@ func checkAnswer() bool {
 	return false
 }
 
+func saveAuthentication(db *bolt.DB, password string) {
+	err := db.Update(func(tx *bolt.Tx) error {
+		bucket, err := util.ConnectToBucket(tx, "2clip_password")
+		if err != nil {
+			return err
+		}
+		err = bucket.Put([]byte("2CLIP_PASSWORD"), []byte(password))
+		if err != nil {
+			return err
+		}
+		fmt.Println("Authentication saved")
+		return nil
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+}

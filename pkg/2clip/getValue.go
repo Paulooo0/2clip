@@ -20,7 +20,7 @@ var GetCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		key := args[0]
 
-		db, _ := database.OpenDatabase()
+		db, _ := database.OpenDatabase("2clip", "2clip")
 
 		defer db.Close()
 
@@ -30,7 +30,7 @@ var GetCmd = &cobra.Command{
 
 func readValue(db *bolt.DB, key string) {
 	err := db.View(func(tx *bolt.Tx) error {
-		bucket, err := util.ConnectToBucket(tx)
+		bucket, err := util.ConnectToBucket(tx, "2clip")
 		if err != nil {
 			return err
 		}

@@ -18,7 +18,7 @@ var ListKeysCmd = &cobra.Command{
 	Short: "List all keys in the database",
 	Long:  `List all keys in the database.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		db, _ := database.OpenDatabase()
+		db, _ := database.OpenDatabase("2clip", "2clip")
 		defer db.Close()
 		listKeys(db)
 	},
@@ -26,7 +26,7 @@ var ListKeysCmd = &cobra.Command{
 
 func listKeys(db *bolt.DB) {
 	err := db.View(func(tx *bolt.Tx) error {
-		bucket, err := util.ConnectToBucket(tx)
+		bucket, err := util.ConnectToBucket(tx, "2clip")
 		if err != nil {
 			return err
 		}
@@ -37,6 +37,14 @@ func listKeys(db *bolt.DB) {
 			keys = append(keys, string(k))
 			return nil
 		})
+
+		// ignore 2CLIP_PASSWORD
+		for i, key := range keys {
+			if key == "2CLIP_PASSWORD" {
+				keys = append(keys[:i], keys[i+1:]...)
+				break
+			}
+		}
 
 		// Sort the keys
 		sort.Strings(keys)

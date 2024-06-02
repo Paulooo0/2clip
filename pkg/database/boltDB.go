@@ -9,7 +9,7 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-func OpenDatabase() (*bolt.DB, error) {
+func OpenDatabase(dbName string, bucketName string) (*bolt.DB, error) {
 	// Get the home directory path
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
@@ -26,21 +26,21 @@ func OpenDatabase() (*bolt.DB, error) {
 	}
 
 	// Construct the database path
-	dbPath := filepath.Join(dataDir, "2clip.db")
+	dbPath := filepath.Join(dataDir, dbName)
 
 	db, err := bolt.Open(dbPath, 0644, nil)
 	if err != nil {
 		log.Fatalf("Failed to open database: %s", err)
 	}
 
-	createBucketIfNotExists(db)
+	CreateBucketIfNotExists(db, bucketName)
 
 	return db, nil
 }
 
-func createBucketIfNotExists(db *bolt.DB) {
+func CreateBucketIfNotExists(db *bolt.DB, name string) {
 	err := db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte("2clip"))
+		_, err := tx.CreateBucketIfNotExists([]byte(name))
 		if err != nil {
 			return fmt.Errorf("create bucket: %s", err)
 		}
