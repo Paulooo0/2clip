@@ -16,7 +16,7 @@ Run the following command, to make the script executable:
 chmod +x install_2clip.sh
 ```
 
-Run the bash script:
+Run the shell script:
 ```bash
 ./install_2clip.sh
 ```
