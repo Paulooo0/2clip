@@ -18,7 +18,8 @@ Run the bash script:
 
 #### Windows
 
-Open PowerShell as an administrator.
+Open PowerShell as an `administrator`.
+
 Run the PowerShell script:
 ```shell
 .\install_2clip.ps1
