@@ -16,6 +16,7 @@ func main() {
 	clip.AddCmdFlags()
 
 	clip.RootCmd.AddCommand(clip.AuthCmd)
+	clip.AuthCmdFlags()
 
 	clip.RootCmd.Execute()
 }

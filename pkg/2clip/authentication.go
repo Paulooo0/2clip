@@ -22,14 +22,29 @@ var AuthCmd = &cobra.Command{
 		db, _ := database.OpenDatabase("2clip.db", "2clip_password")
 		defer db.Close()
 
-		checkAlreadyHaveAuth(db)
+		if cmd.Flags().Changed("update") {
+			password, err := supplyPassword(db)
+			if err != nil {
+				log.Fatal(err)
+			}
+			saveAuthentication(db, password)
 
-		password := getPassword()
+		} else {
+			checkAlreadyHaveAuth(db)
 
-		validateAuth(db, password)
+			password := getPassword()
 
-		saveAuthentication(db, password)
+			validateAuth(db, password)
+
+			saveAuthentication(db, password)
+		}
 	},
+}
+
+func AuthCmdFlags() {
+	AuthCmd.Flags().BoolP("update", "u", true, "Update your authentication")
+
+	AuthCmd.AddCommand(UpdateAuthCmd)
 }
 
 func validateAuth(db *bolt.DB, password string) {
@@ -65,12 +80,16 @@ func getPassword() string {
 	for condition {
 		fmt.Print("Enter your password: ")
 
+		fmt.Print("\033[8m")
 		fmt.Scanln(&password)
+		fmt.Print("\033[28m")
 
 		fmt.Print("Enter your password again: ")
 
 		var passwordAgain string
+		fmt.Println("\033[8m")
 		fmt.Scanln(&passwordAgain)
+		fmt.Println("\033[28m")
 
 		err := matchPassword(password, passwordAgain)
 

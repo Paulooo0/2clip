@@ -27,9 +27,9 @@ var AddCmd = &cobra.Command{
 
 		if cmd.Flags().Changed("protected") {
 			addProtectedToDatabase(db, key, value)
-			return
+		} else {
+			addToDatabase(db, key, value)
 		}
-		addToDatabase(db, key, value)
 	},
 }
 
@@ -43,7 +43,7 @@ var AddProtectedCmd = &cobra.Command{
 		key := args[0]
 		value := args[1]
 
-		db, _ := database.OpenDatabase("2clip", "2clip")
+		db, _ := database.OpenDatabase("2clip.db", "2clip")
 		defer db.Close()
 
 		addProtectedToDatabase(db, key, value)

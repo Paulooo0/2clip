@@ -43,7 +43,10 @@ func readValue(db *bolt.DB, key string) {
 			for condition {
 				var password string
 				fmt.Print("\nEnter your password: ")
+
+				fmt.Print("\033[8m")
 				fmt.Scanln(&password)
+				fmt.Print("\033[28m")
 
 				authenticated := util.ValidatePassword(tx, password)
 
