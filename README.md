@@ -9,26 +9,15 @@
 
 <h2 id="installation">Installation</h2>
 
-#### Unix
-
-Run the following command, to make the script executable:
-```bash
-chmod +x install_2clip.sh
-```
-
-Run the shell script:
-```bash
-./install_2clip.sh
-```
+#### Linux and MacOS
+   ```sh
+   curl -O https://raw.githubusercontent.com/Paulooo0/test-repo/main/install.sh
+   chmod +x install.sh
+   ./install.sh
+   ```
 
 #### Windows
-
-Open PowerShell as an `administrator`.
-
-Run the PowerShell script:
-```shell
-.\install_2clip.ps1
-```
+* Coming soon
 
 <h2 id="how-to-use">How to use</h2>
 
