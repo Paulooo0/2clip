@@ -22,7 +22,7 @@ else
 fi
 
 # Download the binary
-URL="https://github.com/Paulooo0/test-repo/releases/download/$VERSION/$BINARY"
+URL="https://github.com/Paulooo0/2clip/releases/download/$VERSION/$BINARY"
 echo "Downloading $BINARY from $URL"
 curl -L -o "$BINARY" "$URL"
 
