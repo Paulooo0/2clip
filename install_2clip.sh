@@ -1,21 +1,39 @@
 #!/bin/bash
 
-# Ensure the script exits if any command fails
-set -e
+# Define the version you want to install
+VERSION="v1.0.0"
 
-# Compile the Go tool
-echo "Compiling 2clip..."
-go build -o 2clip cmd/2clip/main.go
+# Determine the OS and architecture
+OS=$(uname | tr '[:upper:]' '[:lower:]')
+ARCH=$(uname -m)
 
-# Move the compiled binary to /usr/local/bin
-echo "Moving 2clip to /usr/local/bin..."
-sudo mv 2clip /usr/local/bin/
-
-# Ensure /usr/local/bin is in PATH
-if [[ ":$PATH:" != *":/usr/local/bin:"* ]]; then
-    echo "Adding /usr/local/bin to PATH..."
-    echo 'export PATH=$PATH:/usr/local/bin' >> ~/.bashrc
-    source ~/.bashrc
+if [ "$ARCH" = "x86_64" ]; then
+  ARCH="amd64"
 fi
 
-echo "2clip installation complete. You can now use '2clip' from anywhere in your terminal."
+# Determine the download URL
+if [ "$OS" = "linux" ]; then
+  BINARY="2clip-linux-$ARCH"
+elif [ "$OS" = "darwin" ]; then
+  BINARY="2clip-darwin-$ARCH"
+else
+  echo "Unsupported OS: $OS"
+  exit 1
+fi
+
+# Download the binary
+URL="https://github.com/Paulooo0/test-repo/releases/download/$VERSION/$BINARY"
+echo "Downloading $BINARY from $URL"
+curl -L -o "$BINARY" "$URL"
+
+# Make the binary executable
+chmod +x "$BINARY"
+
+# Move the binary to /usr/local/bin (Linux/macOS) or another directory in PATH
+if [ "$OS" = "windows" ]; then
+  # Windows specific instructions
+  echo "Please move $BINARY to a directory in your PATH manually"
+else
+  sudo mv "$BINARY" /usr/local/bin/2clip-test
+  echo "2clip-test installed to /usr/local/bin/2clip-test"
+fi
