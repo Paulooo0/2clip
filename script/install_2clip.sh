@@ -30,10 +30,5 @@ curl -L -o "$BINARY" "$URL"
 chmod +x "$BINARY"
 
 # Move the binary to /usr/local/bin (Linux/macOS) or another directory in PATH
-if [ "$OS" = "windows" ]; then
-  # Windows specific instructions
-  echo "Please move $BINARY to a directory in your PATH manually"
-else
-  sudo mv "$BINARY" /usr/local/bin/2clip-test
-  echo "2clip installed to /usr/local/bin/2clip"
-fi
+sudo mv "$BINARY" /usr/local/bin/2clip
+echo "2clip installed to /usr/local/bin/2clip"
