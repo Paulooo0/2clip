@@ -11,7 +11,7 @@
 
 #### Linux and MacOS
    ```sh
-   curl -O https://raw.githubusercontent.com/Paulooo0/test-repo/main/install.sh
+   curl -O https://raw.githubusercontent.com/Paulooo0/2clip/main/install.sh
    chmod +x install.sh
    ./install.sh
    ```
