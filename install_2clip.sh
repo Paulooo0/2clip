@@ -35,5 +35,5 @@ if [ "$OS" = "windows" ]; then
   echo "Please move $BINARY to a directory in your PATH manually"
 else
   sudo mv "$BINARY" /usr/local/bin/2clip-test
-  echo "2clip-test installed to /usr/local/bin/2clip-test"
+  echo "2clip installed to /usr/local/bin/2clip"
 fi
