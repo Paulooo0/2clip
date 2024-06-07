@@ -12,8 +12,8 @@
 #### Linux and MacOS
    ```sh
    curl -O https://raw.githubusercontent.com/Paulooo0/2clip/main/script/install_2clip.sh
-   chmod +x install.sh
-   ./install.sh
+   chmod +x install_2clip.sh
+   ./install_2clip.sh
    ```
 
 #### Windows
