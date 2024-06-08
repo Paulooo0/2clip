@@ -5,6 +5,7 @@
 ## Summary
 * [Installation](#installation)
 * [How to use](#how-to-use)
+* [Use cases](#use-cases)
 * [Technologies](#technologies)
 
 <h2 id="installation">Installation</h2>
@@ -26,7 +27,8 @@
 ```bash
 2clip add "My key" "My value"
 ```
-* use `add -p` to add protected keys, that can only be accessed using authentication
+* Use `add -p` to add protected keys, that can only be accessed using authentication
+  * You can use `'` or `"` to add values with spaces
 #### get - adds to your clipboard the value of your provided key
 ```bash
 2clip get "My key"
@@ -59,6 +61,12 @@ bkey
 ```bash
 2clip remove "My key"
 ```
+
+<h2 id="use-cases">Use cases</h2>
+
+* Store passwords securely, using `add -p` (protected value)
+* Use as flash cards for studies
+* Useful for store both important and disposable informations, since is easy and quick to add or remove then
 
 <h2 id="technologies">Technologies</h2>
 
