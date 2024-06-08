@@ -68,12 +68,7 @@ func getNewPassword() string {
 		fmt.Scanln(&newPassword)
 		fmt.Print("\033[28m")
 
-		if len(newPassword) < 1 {
-			fmt.Println("Password cannot be empty")
-			condition = util.AnswerCondition()
-		} else {
-			condition = false
-		}
+		condition = util.ValidatePassword(newPassword)
 	}
 	return newPassword
 }

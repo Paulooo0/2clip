@@ -40,6 +40,11 @@ func CommandAuth() {
 
 	password := getPassword()
 
+	condition := true
+	for condition {
+		condition = util.ValidatePassword(password)
+	}
+
 	util.SaveAuthentication(db, password)
 }
 
@@ -102,25 +107,4 @@ func validateAuth(db *bolt.DB, password string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func checkAnswer() bool {
-	answerCondition := true
-	for answerCondition {
-		fmt.Print("\nYou want to try again? [Y/N]: ")
-
-		var answer string
-		fmt.Scanln(&answer)
-		if answer == "N" || answer == "n" {
-			answerCondition = false
-			os.Exit(0)
-		} else if answer == "Y" || answer == "y" {
-			answerCondition = true
-			return true
-		} else {
-			fmt.Println("Invalid answer, please type Y or N")
-		}
-		answerCondition = false
-	}
-	return false
 }

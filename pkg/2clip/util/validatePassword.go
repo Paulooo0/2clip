@@ -7,13 +7,19 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-func ValidatePassword(password string) error {
-	if password == "" {
-		fmt.Println("Password cannot be empty")
-	} else {
-		return nil
+func ValidatePassword(password string) bool {
+	condition := true
+	for condition {
+		if len(password) < 1 {
+			fmt.Println("Password cannot be empty")
+			condition = AnswerCondition()
+			return condition
+		} else {
+			condition = false
+			return condition
+		}
 	}
-	return nil
+	return condition
 }
 
 func CheckPassword(db *bolt.DB, password string) error {
