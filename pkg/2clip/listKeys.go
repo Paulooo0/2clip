@@ -38,14 +38,6 @@ func listKeys(db *bolt.DB) {
 			return nil
 		})
 
-		// ignore 2CLIP_PASSWORD
-		for i, key := range keys {
-			if key == "2CLIP_PASSWORD" {
-				keys = append(keys[:i], keys[i+1:]...)
-				break
-			}
-		}
-
 		// Sort the keys
 		sort.Strings(keys)
 
@@ -63,7 +55,6 @@ func listKeys(db *bolt.DB) {
 
 		return nil
 	})
-
 	if err != nil {
 		log.Fatal(err)
 	}
