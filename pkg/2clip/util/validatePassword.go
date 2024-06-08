@@ -2,21 +2,36 @@ package util
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/boltdb/bolt"
 )
 
-func ValidatePassword(tx *bolt.Tx, password string) bool {
-	authBucket, _ := ConnectToBucket(tx, "2clip_password")
-
-	value := authBucket.Get([]byte("2CLIP_PASSWORD"))
-	if value == nil {
-		return false
-	} else if string(value) != password {
-		return false
-	} else if len(password) < 1 {
-		fmt.Println("Your password cannot be empty")
-		return false
+func ValidatePassword(password string) error {
+	if password == "" {
+		fmt.Println("Password cannot be empty")
+	} else {
+		return nil
 	}
-	return true
+	return nil
+}
+
+func CheckPassword(db *bolt.DB, password string) error {
+	err := db.View(func(tx *bolt.Tx) error {
+		authBucket, err := ConnectToBucket(tx, "2clip_password")
+		if err != nil {
+			return err
+		}
+
+		value := authBucket.Get([]byte("2CLIP_PASSWORD"))
+
+		if password != string(value) {
+			return fmt.Errorf("Wrong password!")
+		}
+		return nil
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	return nil
 }

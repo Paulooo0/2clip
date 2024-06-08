@@ -6,14 +6,20 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-func CheckKeyAlreadyExists(key string, tx *bolt.Tx, bucketName string) bool {
+func CheckKeyAlreadyExists(key string, db *bolt.DB, bucketName string) bool {
 	var exists bool
+	err := db.View(func(tx *bolt.Tx) error {
+		bucket, err := ConnectToBucket(tx, bucketName)
+		if err != nil {
+			log.Fatal(err)
+		}
+		exists = bucket.Get([]byte(key)) != nil
 
-	bucket, err := ConnectToBucket(tx, bucketName)
+		return nil
+	})
 	if err != nil {
 		log.Fatal(err)
+		return exists == false
 	}
-	exists = bucket.Get([]byte(key)) != nil
-
-	return exists
+	return exists == true
 }

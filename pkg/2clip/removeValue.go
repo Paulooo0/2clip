@@ -37,7 +37,7 @@ func removeValue(db *bolt.DB, key string) {
 			return err
 		}
 
-		err = deleteByKey(tx, bucket, key)
+		err = deleteByKey(db, bucket, key)
 		if err != nil {
 			return err
 		}
@@ -63,9 +63,9 @@ func processKey(bucket *bolt.Bucket, key string) (string, error) {
 	return key, nil
 }
 
-func deleteByKey(tx *bolt.Tx, bucket *bolt.Bucket, key string) error {
+func deleteByKey(db *bolt.DB, bucket *bolt.Bucket, key string) error {
 	if strings.HasSuffix(key, " (protected)") {
-		err := util.Authenticate(tx)
+		err := util.Authenticate(db)
 		if err != nil {
 			return err
 		}

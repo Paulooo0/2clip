@@ -22,38 +22,26 @@ var AddCmd = &cobra.Command{
 		key := args[0]
 		value := args[1]
 
-		db, _ := database.OpenDatabase("2clip.db", "2clip")
-		defer db.Close()
-
+		if cmd.Flags().NFlag() == 0 {
+			CommandAdd(key, value)
+		}
 		if cmd.Flags().Changed("protected") {
-			addProtectedToDatabase(db, key, value)
-		} else {
-			addToDatabase(db, key, value)
+			CommandAddProtected(key, value)
 		}
 	},
 }
 
-var AddProtectedCmd = &cobra.Command{
-	Use:     "protected",
-	Aliases: []string{"-p"},
-	Short:   "Add a protected value to the database",
-	Long:    "Add a protected value to the database based on the provided key.",
-	Args:    cobra.ExactArgs(2),
-	Run: func(cmd *cobra.Command, args []string) {
-		key := args[0]
-		value := args[1]
-
-		db, _ := database.OpenDatabase("2clip.db", "2clip")
-		defer db.Close()
-
-		addProtectedToDatabase(db, key, value)
-	},
-}
-
 func AddCmdFlags() {
-	AddCmd.Flags().BoolP("protected", "p", true, "Add a protected value to the database")
+	AddCmd.Flags().BoolP("protected", "p", false, "Add a protected value to the database")
 
 	AddCmd.AddCommand(AddProtectedCmd)
+}
+
+func CommandAdd(key string, value string) {
+	db, _ := database.OpenDatabase("2clip.db", "2clip")
+	defer db.Close()
+
+	addToDatabase(db, key, value)
 }
 
 func addToDatabase(db *bolt.DB, key string, value string) {
@@ -63,7 +51,7 @@ func addToDatabase(db *bolt.DB, key string, value string) {
 			return err
 		}
 
-		key, err = overwrite(tx, key)
+		key, err = overwrite(db, key)
 		if err != nil {
 			return err
 		}
@@ -85,44 +73,20 @@ func addToDatabase(db *bolt.DB, key string, value string) {
 	}
 }
 
-func addProtectedToDatabase(db *bolt.DB, key string, value string) {
-	err := db.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte("2clip"))
-		if bucket == nil {
-			return fmt.Errorf("bucket 2clip not found")
-		}
-
-		key, err := overwrite(tx, key)
-		if err != nil {
-			return err
-		}
-
-		err = bucket.Put([]byte(key+" (protected)"), []byte(value))
-		if err != nil {
-			return err
-		}
-		fmt.Printf(`Added "%s" with protect value`+"\n", key)
-		return nil
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func overwrite(tx *bolt.Tx, key string) (string, error) {
-	if util.CheckKeyAlreadyExists(key, tx, "2clip") {
+func overwrite(db *bolt.DB, key string) (string, error) {
+	if util.CheckKeyAlreadyExists(key, db, "2clip") {
 		fmt.Printf(`key '%s' already exists, you want to overwrite it? [Y/N]: `, key)
 
 		getOverwriteAnswer()
 
 		return key, nil
 	}
-	if util.CheckKeyAlreadyExists(key+" (protected)", tx, "2clip") {
+	if util.CheckKeyAlreadyExists(key+" (protected)", db, "2clip") {
 		fmt.Printf(`key '%s' already exists, you want to overwrite it? [Y/N]: `, key)
 
 		getOverwriteAnswer()
 
-		err := util.Authenticate(tx)
+		err := util.Authenticate(db)
 		if err != nil {
 			return "", err
 		}
