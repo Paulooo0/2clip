@@ -28,7 +28,6 @@ func getAnswer() bool {
 	if answer == "N" || answer == "n" {
 		os.Exit(0)
 	} else if answer == "Y" || answer == "y" {
-		fmt.Println("ok")
 		return false
 	} else {
 		fmt.Print("\nInvalid answer, please type Y or N: ")

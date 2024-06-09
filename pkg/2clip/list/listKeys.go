@@ -1,4 +1,4 @@
-package clip
+package list
 
 import (
 	"fmt"

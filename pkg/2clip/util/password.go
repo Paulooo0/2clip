@@ -12,11 +12,9 @@ func ValidatePassword(password string) bool {
 	for condition {
 		if len(password) < 1 {
 			fmt.Println("Password cannot be empty")
-			condition = AnswerCondition()
-			return condition
+			return condition == TryAgain()
 		} else {
-			condition = false
-			return condition
+			return condition == false
 		}
 	}
 	return condition

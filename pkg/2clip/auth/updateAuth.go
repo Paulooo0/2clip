@@ -31,24 +31,7 @@ func CommandAuthUpdate() {
 }
 
 func supplyPassword(db *bolt.DB) (string, error) {
-	fmt.Print("Enter your actual password: ")
-
-	var oldPassword string
-	fmt.Print("\033[8m")
-	fmt.Scanln(&oldPassword)
-	fmt.Print("\033[28m")
-
-	util.CheckPassword(db, oldPassword)
-	// validateAuth(db, oldPassword)
-
-	newPassword := getNewPassword()
-
-	fmt.Print("Enter your new password again: ")
-
-	var newPasswordAgain string
-	fmt.Print("\033[8m")
-	fmt.Scanln(&newPasswordAgain)
-	fmt.Print("\033[28m")
+	newPassword, newPasswordAgain := enterPasswords(db)
 
 	err := matchPassword(newPassword, newPasswordAgain)
 	if err != nil {
@@ -56,6 +39,29 @@ func supplyPassword(db *bolt.DB) (string, error) {
 		os.Exit(0)
 	}
 	return newPassword, nil
+}
+
+func enterPasswords(db *bolt.DB) (string, string) {
+	oldPassword := getOldPassword()
+
+	util.CheckPassword(db, oldPassword)
+
+	newPassword := getNewPassword()
+
+	newPasswordAgain := getNewPasswordAgain()
+
+	return newPassword, newPasswordAgain
+}
+
+func getOldPassword() string {
+	fmt.Print("Enter your actual password: ")
+
+	var oldPassword string
+	fmt.Print("\033[8m")
+	fmt.Scanln(&oldPassword)
+	fmt.Print("\033[28m")
+
+	return oldPassword
 }
 
 func getNewPassword() string {
@@ -71,4 +77,15 @@ func getNewPassword() string {
 		condition = util.ValidatePassword(newPassword)
 	}
 	return newPassword
+}
+
+func getNewPasswordAgain() string {
+	fmt.Print("Enter your new password again: ")
+
+	var newPasswordAgain string
+	fmt.Print("\033[8m")
+	fmt.Scanln(&newPasswordAgain)
+	fmt.Print("\033[28m")
+
+	return newPasswordAgain
 }

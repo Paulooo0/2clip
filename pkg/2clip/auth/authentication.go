@@ -65,21 +65,9 @@ func checkAlreadyHaveAuth(db *bolt.DB) error {
 
 func getPassword() string {
 	var password string
-
 	condition := true
 	for condition {
-		fmt.Print("Enter your password: ")
-
-		fmt.Print("\033[8m")
-		fmt.Scanln(&password)
-		fmt.Print("\033[28m")
-
-		fmt.Print("Enter your password again: ")
-
-		var passwordAgain string
-		fmt.Println("\033[8m")
-		fmt.Scanln(&passwordAgain)
-		fmt.Println("\033[28m")
+		password, passwordAgain := enterPassword()
 
 		err := matchPassword(password, passwordAgain)
 
@@ -88,8 +76,32 @@ func getPassword() string {
 		} else {
 			condition = false
 		}
+		return password
 	}
 	return password
+}
+
+func enterPassword() (string, string) {
+	var password string
+	condition := true
+	for condition {
+		fmt.Print("Enter your password: ")
+
+		fmt.Print("\033[8m")
+		fmt.Scanln(&password)
+		fmt.Print("\033[28m")
+
+		condition = util.ValidatePassword(password)
+	}
+
+	fmt.Print("Enter your password again: ")
+
+	var passwordAgain string
+	fmt.Println("\033[8m")
+	fmt.Scanln(&passwordAgain)
+	fmt.Println("\033[28m")
+
+	return password, passwordAgain
 }
 
 func matchPassword(password1 string, password2 string) error {
