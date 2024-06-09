@@ -42,9 +42,9 @@ func readValue(db *bolt.DB, key string) {
 		value := bucket.Get([]byte(key + " (protected)"))
 		keyString := key + " (protected)"
 		if value != nil {
-			condition := true
-			for condition {
-				util.Authenticate(db)
+			err := util.Authenticate(db)
+			if err != nil {
+				return err
 			}
 		} else {
 			value = bucket.Get([]byte(key))

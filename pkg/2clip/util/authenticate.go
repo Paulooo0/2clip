@@ -34,7 +34,6 @@ func Authenticate(db *bolt.DB) error {
 		fmt.Scanln(&password)
 		fmt.Print("\033[28m")
 
-		ValidatePassword(password)
 		err := CheckPassword(db, password)
 		if err != nil {
 			condition = true
@@ -43,9 +42,7 @@ func Authenticate(db *bolt.DB) error {
 			condition = false
 			isAuthenticationFailed(condition)
 		}
-
 	}
-
 	return nil
 }
 

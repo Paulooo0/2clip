@@ -36,11 +36,7 @@ func addProtectedToDatabase(db *bolt.DB, key string, value string) {
 		if err != nil {
 			return err
 		}
-		if strings.HasSuffix(key, " (protected)") {
-			err = bucket.Put([]byte(key), []byte(value))
-		} else {
-			err = bucket.Put([]byte(key+" (protected)"), []byte(value))
-		}
+		err = addProtectedValue(key, value, bucket)
 		if err != nil {
 			return err
 		}
@@ -49,5 +45,15 @@ func addProtectedToDatabase(db *bolt.DB, key string, value string) {
 	})
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+func addProtectedValue(key string, value string, bucket *bolt.Bucket) error {
+	if strings.HasSuffix(key, " (protected)") {
+		err := bucket.Put([]byte(key), []byte(value))
+		return err
+	} else {
+		err := bucket.Put([]byte(key+" (protected)"), []byte(value))
+		return err
 	}
 }
