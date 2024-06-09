@@ -84,7 +84,7 @@ func getPassword() string {
 		err := matchPassword(password, passwordAgain)
 
 		if err != nil {
-			condition = util.AnswerCondition()
+			condition = util.TryAgain()
 		} else {
 			condition = false
 		}

@@ -3,7 +3,6 @@ package clip
 import (
 	"fmt"
 	"log"
-	"os"
 	"strings"
 
 	"github.com/boltdb/bolt"
@@ -75,16 +74,12 @@ func addToDatabase(db *bolt.DB, key string, value string) {
 
 func overwrite(db *bolt.DB, key string) (string, error) {
 	if util.CheckKeyAlreadyExists(key, db, "2clip") {
-		fmt.Printf(`key '%s' already exists, you want to overwrite it? [Y/N]: `, key)
-
-		getOverwriteAnswer()
+		getOverwriteAnswer(key)
 
 		return key, nil
 	}
 	if util.CheckKeyAlreadyExists(key+" (protected)", db, "2clip") {
-		fmt.Printf(`key '%s' already exists, you want to overwrite it? [Y/N]: `, key)
-
-		getOverwriteAnswer()
+		getOverwriteAnswer(key)
 
 		err := util.Authenticate(db)
 		if err != nil {
@@ -96,18 +91,8 @@ func overwrite(db *bolt.DB, key string) (string, error) {
 	return key, nil
 }
 
-func getOverwriteAnswer() {
-	answerCondition := true
-	for answerCondition {
-		var answer string
-		fmt.Scanln(&answer)
-		if answer == "N" || answer == "n" {
-			os.Exit(0)
-		} else if answer == "Y" || answer == "y" {
-			answerCondition = false
-		} else {
-			fmt.Print("Invalid answer, please type Y or N: ")
-			answerCondition = true
-		}
-	}
+func getOverwriteAnswer(key string) {
+	fmt.Printf(`key '%s' already exists, you want to overwrite it? [Y/N]: `, key)
+
+	util.AnswerCondition()
 }
