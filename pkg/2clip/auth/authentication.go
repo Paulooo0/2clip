@@ -40,11 +40,6 @@ func CommandAuth() {
 
 	password := getPassword()
 
-	condition := true
-	for condition {
-		condition = util.ValidatePassword(password)
-	}
-
 	util.SaveAuthentication(db, password)
 }
 
@@ -64,24 +59,20 @@ func checkAlreadyHaveAuth(db *bolt.DB) error {
 }
 
 func getPassword() string {
-	var password string
-	condition := true
-	for condition {
-		password, passwordAgain := enterPassword()
+	password := enterPassword()
+	passwordAgain := enterPasswordAgain()
 
-		err := matchPassword(password, passwordAgain)
-
-		if err != nil {
-			condition = util.TryAgain()
-		} else {
-			condition = false
-		}
-		return password
+	err := matchPassword(password, passwordAgain)
+	if err != nil {
+		fmt.Println(err)
+		fmt.Println("Run '2clip auth' to try again")
+		os.Exit(0)
 	}
+
 	return password
 }
 
-func enterPassword() (string, string) {
+func enterPassword() string {
 	var password string
 	condition := true
 	for condition {
@@ -94,6 +85,10 @@ func enterPassword() (string, string) {
 		condition = util.ValidatePassword(password)
 	}
 
+	return password
+}
+
+func enterPasswordAgain() string {
 	fmt.Print("Enter your password again: ")
 
 	var passwordAgain string
@@ -101,12 +96,12 @@ func enterPassword() (string, string) {
 	fmt.Scanln(&passwordAgain)
 	fmt.Println("\033[28m")
 
-	return password, passwordAgain
+	return passwordAgain
 }
 
 func matchPassword(password1 string, password2 string) error {
 	if password1 != password2 {
-		return fmt.Errorf("Passwords do not match! Try again")
+		return fmt.Errorf("Passwords do not match!")
 	}
 	return nil
 }

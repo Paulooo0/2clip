@@ -14,9 +14,9 @@ func AnswerCondition() bool {
 }
 
 func TryAgain() bool {
+	fmt.Print("\nDo you want to try again? [Y/N]: ")
 	answerCondition := true
 	for answerCondition {
-		fmt.Print("\nDo you want to try again? [Y/N]: ")
 		answerCondition = getAnswer()
 	}
 	return true

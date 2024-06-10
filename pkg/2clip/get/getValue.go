@@ -54,26 +54,30 @@ func readValue(db *bolt.DB, key string) {
 			}
 		}
 
-		if strings.HasSuffix(keyString, " (protected)") {
-			err := clipboard.WriteAll(string(value))
-
-			fmt.Println("Protected value copied to clipboard")
-			if err != nil {
-				log.Fatal(err)
-			}
-		} else {
-			fmt.Println(string(value))
-
-			err := clipboard.WriteAll(string(value))
-			fmt.Println("Value copied to clipboard")
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
+		copyToClipboard(keyString, value)
 
 		return nil
 	})
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+func copyToClipboard(keyString string, value []byte) {
+	if strings.HasSuffix(keyString, " (protected)") {
+		err := clipboard.WriteAll(string(value))
+
+		fmt.Println("Protected value copied to clipboard")
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		fmt.Println(string(value))
+
+		err := clipboard.WriteAll(string(value))
+		fmt.Println("Value copied to clipboard")
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
