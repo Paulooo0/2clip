@@ -2,12 +2,30 @@ package util
 
 import (
 	"fmt"
-	"os"
+	"log"
 
 	"github.com/boltdb/bolt"
 )
 
-func Authenticate(tx *bolt.Tx) error {
+func SaveAuthentication(db *bolt.DB, password string) {
+	err := db.Update(func(tx *bolt.Tx) error {
+		bucket, err := ConnectToBucket(tx, "2clip_password")
+		if err != nil {
+			return err
+		}
+		err = bucket.Put([]byte("2CLIP_PASSWORD"), []byte(password))
+		if err != nil {
+			return err
+		}
+		fmt.Println("Authentication saved")
+		return nil
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func Authenticate(db *bolt.DB) error {
 	condition := true
 	for condition {
 		var password string
@@ -16,36 +34,24 @@ func Authenticate(tx *bolt.Tx) error {
 		fmt.Scanln(&password)
 		fmt.Print("\033[28m")
 
-		authenticated := ValidatePassword(tx, password)
-
-		condition = isAutheticationFailed(authenticated)
+		err := CheckPassword(db, password)
+		if err != nil {
+			condition = true
+			isAuthenticationFailed(condition)
+		} else {
+			condition = false
+			isAuthenticationFailed(condition)
+		}
 	}
-
 	return nil
 }
 
-func isAutheticationFailed(authenticated bool) bool {
-	if !authenticated {
+func isAuthenticationFailed(condition bool) {
+	if condition {
 		fmt.Println("\nAuthentication failed!")
 		fmt.Println("TIP: if you don't have a password, run '2clip auth' to create one")
 
-		answerCondition := true
-		for answerCondition {
-			fmt.Print("Do you want to try again? [Y/N]: ")
-			var answer string
-			fmt.Scanln(&answer)
-			if answer == "N" || answer == "n" {
-				os.Exit(0)
-			} else if answer == "Y" || answer == "y" {
-				answerCondition = false
-			} else {
-				fmt.Println("\nInvalid answer, please type Y or N")
-				answerCondition = true
-			}
-		}
-		return true
 	} else {
 		fmt.Println("\nAuthentication successful!")
-		return false
 	}
 }

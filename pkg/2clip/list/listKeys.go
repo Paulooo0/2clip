@@ -1,4 +1,4 @@
-package clip
+package list
 
 import (
 	"fmt"
@@ -31,40 +31,32 @@ func listKeys(db *bolt.DB) {
 			return err
 		}
 
-		// Create a slice of keys
 		keys := make([]string, 0, bucket.Stats().KeyN)
 		bucket.ForEach(func(k, _ []byte) error {
 			keys = append(keys, string(k))
 			return nil
 		})
 
-		// ignore 2CLIP_PASSWORD
-		for i, key := range keys {
-			if key == "2CLIP_PASSWORD" {
-				keys = append(keys[:i], keys[i+1:]...)
-				break
-			}
-		}
-
-		// Sort the keys
 		sort.Strings(keys)
 
-		// Print the keys with sorting by letter
-		prevLetter := ""
-		for _, key := range keys {
-			letter := string(key[0])
-			if letter != prevLetter {
-				upperLetter := strings.ToUpper(letter)
-				fmt.Printf("\n%s\n", upperLetter)
-				prevLetter = letter
-			}
-			fmt.Println(key)
-		}
+		printSortedKeys(keys)
 
 		return nil
 	})
-
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+func printSortedKeys(keys []string) {
+	prevLetter := ""
+	for _, key := range keys {
+		letter := string(key[0])
+		if letter != prevLetter {
+			upperLetter := strings.ToUpper(letter)
+			fmt.Printf("\n%s\n", upperLetter)
+			prevLetter = letter
+		}
+		fmt.Println(key)
 	}
 }
