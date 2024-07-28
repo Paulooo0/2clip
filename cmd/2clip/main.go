@@ -1,12 +1,12 @@
 package main
 
 import (
-	clip "github.com/Paulooo0/2clip/pkg/2clip"
-	"github.com/Paulooo0/2clip/pkg/2clip/add"
-	"github.com/Paulooo0/2clip/pkg/2clip/auth"
-	"github.com/Paulooo0/2clip/pkg/2clip/get"
-	"github.com/Paulooo0/2clip/pkg/2clip/list"
-	"github.com/Paulooo0/2clip/pkg/2clip/remove"
+	clip "github.com/Paulooo0/2clip/internal/2clip"
+	"github.com/Paulooo0/2clip/internal/2clip/add"
+	"github.com/Paulooo0/2clip/internal/2clip/auth"
+	"github.com/Paulooo0/2clip/internal/2clip/get"
+	"github.com/Paulooo0/2clip/internal/2clip/list"
+	"github.com/Paulooo0/2clip/internal/2clip/remove"
 )
 
 func main() {

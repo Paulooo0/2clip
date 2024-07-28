@@ -8,8 +8,8 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/spf13/cobra"
 
-	"github.com/Paulooo0/2clip/pkg/2clip/util"
-	"github.com/Paulooo0/2clip/pkg/database"
+	"github.com/Paulooo0/2clip/internal/2clip/util"
+	"github.com/Paulooo0/2clip/internal/database"
 )
 
 var RemoveCmd = &cobra.Command{
