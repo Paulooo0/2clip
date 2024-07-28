@@ -3,8 +3,10 @@ package util
 import (
 	"fmt"
 	"log"
+	"syscall"
 
 	"github.com/boltdb/bolt"
+	"golang.org/x/term"
 )
 
 func SaveAuthentication(db *bolt.DB, password string) {
@@ -28,13 +30,16 @@ func SaveAuthentication(db *bolt.DB, password string) {
 func Authenticate(db *bolt.DB) error {
 	condition := true
 	for condition {
-		var password string
 		fmt.Print("\nEnter your password: ")
-		fmt.Print("\033[8m")
-		fmt.Scanln(&password)
-		fmt.Print("\033[28m")
 
-		err := CheckPassword(db, password)
+		bytePassword, err := term.ReadPassword(int(syscall.Stdin))
+		if err != nil {
+			return err
+		}
+
+		password := string(bytePassword)
+
+		err = CheckPassword(db, password)
 		if err != nil {
 			condition = true
 			isAuthenticationFailed(condition)

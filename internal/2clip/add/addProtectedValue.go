@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/Paulooo0/2clip/pkg/database"
+	"github.com/Paulooo0/2clip/internal/database"
 	"github.com/boltdb/bolt"
 	"github.com/spf13/cobra"
 )
