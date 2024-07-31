@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version you want to install
-VERSION="v1.0.2"
+VERSION="1.0.2"
 
 # Determine the OS and architecture
 OS=$(uname | tr '[:upper:]' '[:lower:]')
@@ -27,7 +27,7 @@ else
 fi
 
 # Download the binary
-URL="https://github.com/Paulooo0/2clip/releases/download/$VERSION/$BINARY"
+URL="https://github.com/Paulooo0/2clip/releases/download/v$VERSION/$BINARY"
 echo "Downloading $BINARY from $URL"
 curl -L -o "$BINARY" "$URL"
 
