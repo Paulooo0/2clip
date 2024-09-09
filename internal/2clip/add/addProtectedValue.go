@@ -7,25 +7,16 @@ import (
 
 	"github.com/Paulooo0/2clip/internal/database"
 	"github.com/boltdb/bolt"
-	"github.com/spf13/cobra"
 )
 
-var AddProtectedCmd = &cobra.Command{
-	Use:     "protected",
-	Aliases: []string{"-p"},
-	Short:   "Add a protected value to the database",
-	Long:    "Add a protected value to the database based on the provided key.",
-	Args:    cobra.ExactArgs(2),
-}
-
-func CommandAddProtected(key string, value string) {
+func CommandAddProtected(key string) {
 	db, _ := database.OpenDatabase("2clip.db", "2clip")
 	defer db.Close()
 
-	addProtectedToDatabase(db, key, value)
+	addProtectedToDatabase(db, key)
 }
 
-func addProtectedToDatabase(db *bolt.DB, key string, value string) {
+func addProtectedToDatabase(db *bolt.DB, key string) {
 	err := db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte("2clip"))
 		if bucket == nil {
@@ -36,6 +27,11 @@ func addProtectedToDatabase(db *bolt.DB, key string, value string) {
 		if err != nil {
 			return err
 		}
+
+		fmt.Println("Input value:")
+		var value string
+		fmt.Scanln(&value)
+
 		err = addProtectedValue(key, value, bucket)
 		if err != nil {
 			return err

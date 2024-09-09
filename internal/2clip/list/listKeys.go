@@ -31,7 +31,8 @@ func listKeys(db *bolt.DB) {
 			return err
 		}
 
-		keys := make([]string, 0, bucket.Stats().KeyN)
+		keyN := bucket.Stats().KeyN
+		keys := make([]string, 0, keyN)
 		bucket.ForEach(func(k, _ []byte) error {
 			keys = append(keys, string(k))
 			return nil
@@ -49,12 +50,17 @@ func listKeys(db *bolt.DB) {
 }
 
 func printSortedKeys(keys []string) {
-	prevLetter := ""
+	if len(keys) == 0 {
+		return
+	}
+
+	prevLetter := strings.ToUpper(string(keys[0][0]))
+	fmt.Printf("\n%s\n", prevLetter)
+
 	for _, key := range keys {
-		letter := string(key[0])
+		letter := strings.ToUpper(string(key[0]))
 		if letter != prevLetter {
-			upperLetter := strings.ToUpper(letter)
-			fmt.Printf("\n%s\n", upperLetter)
+			fmt.Printf("\n%s\n", letter)
 			prevLetter = letter
 		}
 		fmt.Println(key)
