@@ -13,17 +13,24 @@ import (
 )
 
 var AddCmd = &cobra.Command{
-	Use:   "add",
-	Short: "Add a value to the database",
-	Long:  "Add a value to the database based on the provided key.",
-	Args:  cobra.ExactArgs(1),
+	Use:        "add",
+	Aliases:    []string{"a"},
+	ValidArgs:  []string{"-p"},
+	ArgAliases: []string{"-p"},
+	Short:      "Add a key-value to database",
+	Long:       "Add a value by input to database, linked to the provided key.",
+	Example: `
+	2clip add <key>
+	2clip add [ARG] <key>
+	`,
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		key := args[0]
 
 		if cmd.Flags().NFlag() == 0 {
 			CommandAdd(key)
 		}
-		if cmd.Flags().Changed("protected") {
+		if (cmd.Flags().Changed("protected")) || (cmd.Flags().Changed("p")) {
 			CommandAddProtected(key)
 		}
 	},
@@ -31,8 +38,6 @@ var AddCmd = &cobra.Command{
 
 func AddCmdFlags() {
 	AddCmd.Flags().BoolP("protected", "p", false, "Add a protected value to the database")
-
-	AddCmd.AddCommand(AddProtectedCmd)
 }
 
 func CommandAdd(key string) {
@@ -54,7 +59,7 @@ func addToDatabase(db *bolt.DB, key string) {
 			return err
 		}
 
-		fmt.Println("Input value:\n")
+		fmt.Println("Input value:")
 		var value string
 		fmt.Scanln(&value)
 

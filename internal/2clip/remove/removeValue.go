@@ -13,10 +13,14 @@ import (
 )
 
 var RemoveCmd = &cobra.Command{
-	Use:   "remove",
-	Short: "Remove a value from the database",
-	Long:  `Remove a value from the database based on the provided key.`,
-	Args:  cobra.ExactArgs(1),
+	Use:     "remove",
+	Aliases: []string{"rm"},
+	Short:   "Remove a key-value from the database",
+	Long:    `Remove a key-value from the database based on the provided key.`,
+	Example: `
+	2clip remove <key>
+	`,
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		key := args[0]
 		db, _ := database.OpenDatabase("2clip.db", "2clip")
