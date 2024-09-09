@@ -16,16 +16,15 @@ var AddCmd = &cobra.Command{
 	Use:   "add",
 	Short: "Add a value to the database",
 	Long:  "Add a value to the database based on the provided key.",
-	Args:  cobra.ExactArgs(2),
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		key := args[0]
-		value := args[1]
 
 		if cmd.Flags().NFlag() == 0 {
-			CommandAdd(key, value)
+			CommandAdd(key)
 		}
 		if cmd.Flags().Changed("protected") {
-			CommandAddProtected(key, value)
+			CommandAddProtected(key)
 		}
 	},
 }
@@ -36,14 +35,14 @@ func AddCmdFlags() {
 	AddCmd.AddCommand(AddProtectedCmd)
 }
 
-func CommandAdd(key string, value string) {
+func CommandAdd(key string) {
 	db, _ := database.OpenDatabase("2clip.db", "2clip")
 	defer db.Close()
 
-	addToDatabase(db, key, value)
+	addToDatabase(db, key)
 }
 
-func addToDatabase(db *bolt.DB, key string, value string) {
+func addToDatabase(db *bolt.DB, key string) {
 	err := db.Update(func(tx *bolt.Tx) error {
 		bucket, err := util.ConnectToBucket(tx, "2clip")
 		if err != nil {
@@ -54,6 +53,10 @@ func addToDatabase(db *bolt.DB, key string, value string) {
 		if err != nil {
 			return err
 		}
+
+		fmt.Println("Input value:\n")
+		var value string
+		fmt.Scanln(&value)
 
 		err = bucket.Put([]byte(key), []byte(value))
 		if err != nil {
