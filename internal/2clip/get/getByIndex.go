@@ -3,7 +3,6 @@ package get
 import (
 	"fmt"
 	"log"
-	"sort"
 	"strconv"
 	"strings"
 
@@ -30,7 +29,7 @@ func readIndexValue(db *bolt.DB, index string) {
 			return err
 		}
 
-		keys, err := getSortedKeys(bucket)
+		keys, err := util.GetSortedKeys(bucket)
 		if err != nil {
 			return err
 		}
@@ -54,19 +53,6 @@ func parseAndValidateIndex(index string) (int, error) {
 		return 0, fmt.Errorf("invalid index: %s", index)
 	}
 	return idx - 1, nil
-}
-
-func getSortedKeys(bucket *bolt.Bucket) ([]string, error) {
-	var keys []string
-	err := bucket.ForEach(func(k, v []byte) error {
-		keys = append(keys, string(k))
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-	sort.Strings(keys)
-	return keys, nil
 }
 
 func processKeyValue(bucket *bolt.Bucket, key string, db *bolt.DB) error {

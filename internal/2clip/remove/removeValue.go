@@ -13,20 +13,38 @@ import (
 )
 
 var RemoveCmd = &cobra.Command{
-	Use:     "remove",
-	Aliases: []string{"rm"},
-	Short:   "Remove a key-value from the database",
-	Long:    `Remove a key-value from the database based on the provided key.`,
+	Use:        "remove",
+	Aliases:    []string{"rm"},
+	ValidArgs:  []string{"-i"},
+	ArgAliases: []string{"-i"},
+	Short:      "Remove a key-value from the database",
+	Long:       `Remove a key-value from the database based on the provided key.`,
 	Example: `
 	2clip remove <key>
+	2clip remove [ARG] <key>
 	`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		key := args[0]
-		db, _ := database.OpenDatabase("2clip.db", "2clip")
-		defer db.Close()
-		removeValue(db, key)
+
+		if cmd.Flags().NFlag() == 0 {
+			commandRemove(key)
+		}
+		if cmd.Flags().Changed("index") || cmd.Flags().Changed("i") {
+			commandRemoveByIndex(key)
+		}
 	},
+}
+
+func RemoveCmdFlags() {
+	RemoveCmd.Flags().BoolP("index", "i", false, "Remove a value from the database by index")
+}
+
+func commandRemove(key string) {
+	db, _ := database.OpenDatabase("2clip.db", "2clip")
+	defer db.Close()
+
+	removeValue(db, key)
 }
 
 func removeValue(db *bolt.DB, key string) {
@@ -79,7 +97,7 @@ func deleteByKey(db *bolt.DB, bucket *bolt.Bucket, key string) error {
 			return err
 		}
 
-		fmt.Printf(`Removed '%s'`+"\n", key)
+		fmt.Printf(`Removed "%s"`+"\n", key[:len(key)-12])
 		return nil
 	} else {
 		err := bucket.Delete([]byte(key))
@@ -87,7 +105,7 @@ func deleteByKey(db *bolt.DB, bucket *bolt.Bucket, key string) error {
 			return err
 		}
 
-		fmt.Printf(`Removed '%s'`+"\n", key)
+		fmt.Printf(`Removed "%s"`+"\n", key)
 		return nil
 	}
 }

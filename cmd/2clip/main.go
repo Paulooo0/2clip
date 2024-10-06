@@ -17,6 +17,7 @@ func main() {
 	get.GetCmdFlags()
 
 	clip.RootCmd.AddCommand(remove.RemoveCmd)
+	remove.RemoveCmdFlags()
 
 	clip.RootCmd.AddCommand(list.ListKeysCmd)
 

@@ -28,7 +28,7 @@ var AddCmd = &cobra.Command{
 		key := args[0]
 
 		if cmd.Flags().NFlag() == 0 {
-			CommandAdd(key)
+			commandAdd(key)
 		}
 		if (cmd.Flags().Changed("protected")) || (cmd.Flags().Changed("p")) {
 			CommandAddProtected(key)
@@ -40,7 +40,7 @@ func AddCmdFlags() {
 	AddCmd.Flags().BoolP("protected", "p", false, "Add a protected value to the database")
 }
 
-func CommandAdd(key string) {
+func commandAdd(key string) {
 	db, _ := database.OpenDatabase("2clip.db", "2clip")
 	defer db.Close()
 
@@ -69,9 +69,9 @@ func addToDatabase(db *bolt.DB, key string) {
 		}
 
 		if strings.HasSuffix(key, " (protected)") {
-			fmt.Printf(`Added '%s' with protect value`+"\n", key)
+			fmt.Printf(`Added "%s" with protect value`+"\n", key)
 		} else {
-			fmt.Printf(`Added '%s' with value "%s"`+"\n", key, value)
+			fmt.Printf(`Added "%s" with value "%s"`+"\n", key, value)
 		}
 		return nil
 	})
