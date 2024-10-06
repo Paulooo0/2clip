@@ -57,12 +57,12 @@ func printSortedKeys(keys []string) {
 	prevLetter := strings.ToUpper(string(keys[0][0]))
 	fmt.Printf("\n%s\n", prevLetter)
 
-	for _, key := range keys {
+	for i, key := range keys {
 		letter := strings.ToUpper(string(key[0]))
 		if letter != prevLetter {
 			fmt.Printf("\n%s\n", letter)
 			prevLetter = letter
 		}
-		fmt.Println(key)
+		fmt.Printf("[%d] %s\n", i+1, key)
 	}
 }
