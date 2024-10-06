@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version you want to install
-VERSION="1.1.0"
+VERSION="1.2.0"
 
 # Determine the OS and architecture
 OS=$(uname | tr '[:upper:]' '[:lower:]')
