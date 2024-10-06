@@ -18,10 +18,19 @@ var GetCmd = &cobra.Command{
 	Short: "Get a value from the database",
 	Long:  `Get a value from the database based on the provided key.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		key := args[0]
+		arg := args[0]
 
-		commandGet(key)
+		if cmd.Flags().NFlag() == 0 {
+			commandGet(arg)
+		}
+		if cmd.Flags().Changed("index") || cmd.Flags().Changed("i") {
+			commandGetByIndex(arg)
+		}
 	},
+}
+
+func GetCmdFlags() {
+	GetCmd.Flags().BoolP("index", "i", false, "Get a value from the database by index")
 }
 
 func commandGet(key string) {
