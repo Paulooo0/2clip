@@ -3,7 +3,6 @@ package list
 import (
 	"fmt"
 	"log"
-	"sort"
 	"strings"
 
 	"github.com/boltdb/bolt"
@@ -26,24 +25,20 @@ var ListKeysCmd = &cobra.Command{
 
 func listKeys(db *bolt.DB) {
 	err := db.View(func(tx *bolt.Tx) error {
-		bucket, err := util.ConnectToBucket(tx, "2clip")
+		bucket := tx.Bucket([]byte("2clip"))
+		if bucket == nil {
+			return fmt.Errorf("bucket not found")
+		}
+
+		keys, err := util.GetSortedKeys(bucket)
 		if err != nil {
 			return err
 		}
 
-		keyN := bucket.Stats().KeyN
-		keys := make([]string, 0, keyN)
-		bucket.ForEach(func(k, _ []byte) error {
-			keys = append(keys, string(k))
-			return nil
-		})
-
-		sort.Strings(keys)
-
 		printSortedKeys(keys)
-
 		return nil
 	})
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -57,12 +52,12 @@ func printSortedKeys(keys []string) {
 	prevLetter := strings.ToUpper(string(keys[0][0]))
 	fmt.Printf("\n%s\n", prevLetter)
 
-	for _, key := range keys {
+	for i, key := range keys {
 		letter := strings.ToUpper(string(key[0]))
 		if letter != prevLetter {
 			fmt.Printf("\n%s\n", letter)
 			prevLetter = letter
 		}
-		fmt.Println(key)
+		fmt.Printf("[%d] %s\n", i+1, key)
 	}
 }

@@ -14,14 +14,30 @@ import (
 )
 
 var GetCmd = &cobra.Command{
-	Use:   "get",
-	Short: "Get a value from the database",
-	Long:  `Get a value from the database based on the provided key.`,
+	Use:        "get",
+	Aliases:    []string{"g"},
+	ValidArgs:  []string{"-i"},
+	ArgAliases: []string{"-i"},
+	Short:      "Get a value from the database",
+	Long:       `Get a value from the database based on the provided key.`,
+	Example: `
+	2clip get <key>
+	2clip get [ARG] <key>
+	`,
 	Run: func(cmd *cobra.Command, args []string) {
-		key := args[0]
+		arg := args[0]
 
-		commandGet(key)
+		if cmd.Flags().NFlag() == 0 {
+			commandGet(arg)
+		}
+		if cmd.Flags().Changed("index") || cmd.Flags().Changed("i") {
+			commandGetByIndex(arg)
+		}
 	},
+}
+
+func GetCmdFlags() {
+	GetCmd.Flags().BoolP("index", "i", false, "Get a value from the database by index")
 }
 
 func commandGet(key string) {
@@ -67,7 +83,7 @@ func copyToClipboard(keyString string, value []byte) {
 	if strings.HasSuffix(keyString, " (protected)") {
 		err := clipboard.WriteAll(string(value))
 
-		fmt.Println("Protected value copied to clipboard")
+		fmt.Printf(`"%s" protected value copied to clipboard\n`, keyString[:len(keyString)-12])
 		if err != nil {
 			log.Fatal(err)
 		}

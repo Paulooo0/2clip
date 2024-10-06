@@ -14,8 +14,10 @@ func main() {
 	add.AddCmdFlags()
 
 	clip.RootCmd.AddCommand(get.GetCmd)
+	get.GetCmdFlags()
 
 	clip.RootCmd.AddCommand(remove.RemoveCmd)
+	remove.RemoveCmdFlags()
 
 	clip.RootCmd.AddCommand(list.ListKeysCmd)
 
