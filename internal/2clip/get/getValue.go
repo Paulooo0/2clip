@@ -83,7 +83,7 @@ func copyToClipboard(keyString string, value []byte) {
 	if strings.HasSuffix(keyString, " (protected)") {
 		err := clipboard.WriteAll(string(value))
 
-		fmt.Printf(`"%s" protected value copied to clipboard\n`, keyString[:len(keyString)-12])
+		fmt.Printf(`"%s" protected value copied to clipboard`, keyString[:len(keyString)-12])
 		if err != nil {
 			log.Fatal(err)
 		}
