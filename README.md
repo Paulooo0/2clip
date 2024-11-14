@@ -27,12 +27,12 @@
 ```bash
 2clip add "My key" "My value"
 ```
+* Use `add -p` to add protected keys, that can only be accessed using authentication
+* You can use `'` or `"` to add values with spaces
 The terminal will be open to be inserted your input for the key `My key`, in this exemple, we will input `My value` to be value associated with this key
 ```bash
 My value
 ```
-* Use `add -p` to add protected keys, that can only be accessed using authentication
-  * You can use `'` or `"` to add values with spaces
 #### get - adds to your clipboard the value of your provided key
 ```bash
 2clip get "My key"
