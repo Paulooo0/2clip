@@ -1,8 +1,10 @@
 package add
 
 import (
+	"bufio"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/Paulooo0/2clip/internal/database"
@@ -29,8 +31,9 @@ func addProtectedToDatabase(db *bolt.DB, key string) {
 		}
 
 		fmt.Println("Input value:")
-		var value string
-		fmt.Scanln(&value)
+		reader := bufio.NewReader(os.Stdin)
+		value, _ := reader.ReadString('\n')
+		value = strings.TrimSpace(value)
 
 		err = addProtectedValue(key, value, bucket)
 		if err != nil {

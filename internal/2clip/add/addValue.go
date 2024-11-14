@@ -1,8 +1,10 @@
 package add
 
 import (
+	"bufio"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/boltdb/bolt"
@@ -60,8 +62,9 @@ func addToDatabase(db *bolt.DB, key string) {
 		}
 
 		fmt.Println("Input value:")
-		var value string
-		fmt.Scanln(&value)
+		reader := bufio.NewReader(os.Stdin)
+		value, _ := reader.ReadString('\n')
+		value = strings.TrimSpace(value)
 
 		err = bucket.Put([]byte(key), []byte(value))
 		if err != nil {
