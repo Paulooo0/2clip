@@ -27,30 +27,39 @@
 ```bash
 2clip add "My key" "My value"
 ```
+The terminal will be open to be inserted your input for the key `My key`, in this exemple, we will input `My value` to be value associated with this key
+```bash
+My value
+```
 * Use `add -p` to add protected keys, that can only be accessed using authentication
   * You can use `'` or `"` to add values with spaces
 #### get - adds to your clipboard the value of your provided key
 ```bash
 2clip get "My key"
 ```
+* You can also use the index of the key using the argument `-i`, if the index of this key is `1`, so the command is:
+```bash
+2clip get -i 1
+```
 Output:
 ```bash
 My value
 Value copied to clipboard
 ```
-#### list - lists all keys alphabetically sorted
+
+#### list - lists all keys alphabetically sorted, and its own index
 ```bash
 2clip list
 ```
 Output:
 ```bash
 A
-akey
+[1] akey
 
 B
-bkey
+[2] bkey
 ```
-
+---
 ### Other commands
 #### auth - allows you to create a password
 ```bash
