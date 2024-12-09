@@ -38,7 +38,6 @@ func listKeys(db *bolt.DB) {
 		printSortedKeys(keys)
 		return nil
 	})
-
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -50,14 +49,18 @@ func printSortedKeys(keys []string) {
 	}
 
 	prevLetter := strings.ToUpper(string(keys[0][0]))
-	fmt.Printf("\n%s\n", prevLetter)
+	fmt.Printf("\n\033[1m"+"\033[32m"+"➜ "+"\033[0m"+"\033[1m"+"%s"+"\033[0m\n", prevLetter)
 
 	for i, key := range keys {
 		letter := strings.ToUpper(string(key[0]))
 		if letter != prevLetter {
-			fmt.Printf("\n%s\n", letter)
+			fmt.Printf("\n\033[1m"+"\033[32m"+"➜ "+"\033[0m"+"\033[1m"+"%s"+"\033[0m\n", letter)
 			prevLetter = letter
 		}
-		fmt.Printf("[%d] %s\n", i+1, key)
+		if strings.HasSuffix(key, " (protected)") {
+			fmt.Printf("\033[94m"+"%d"+"\033[0m %s 🔒\n", i+1, key[:len(key)-12])
+		} else {
+			fmt.Printf("\033[33m"+"%d"+"\033[0m %s\n", i+1, key)
+		}
 	}
 }

@@ -1,12 +1,12 @@
 package add
 
 import (
-	"bufio"
 	"fmt"
 	"log"
 	"os"
 	"strings"
 
+	"github.com/Paulooo0/2clip/internal/2clip/util"
 	"github.com/Paulooo0/2clip/internal/database"
 	"github.com/boltdb/bolt"
 )
@@ -15,31 +15,28 @@ func CommandAddProtected(key string) {
 	db, _ := database.OpenDatabase("2clip.db", "2clip")
 	defer db.Close()
 
-	addProtectedToDatabase(db, key)
+	key, err := overwrite(db, key)
+	if err != nil {
+		fmt.Errorf("overwrite failed: %v", err)
+		os.Exit(0)
+	}
+
+	input := GetInput()
+	addProtectedToDatabase(db, key, input)
 }
 
-func addProtectedToDatabase(db *bolt.DB, key string) {
+func addProtectedToDatabase(db *bolt.DB, key string, value string) {
 	err := db.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte("2clip"))
+		bucket, err := util.ConnectToBucket(tx, "2clip")
 		if bucket == nil {
 			return fmt.Errorf("bucket 2clip not found")
 		}
-
-		key, err := overwrite(db, key)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println("Input value:")
-		reader := bufio.NewReader(os.Stdin)
-		value, _ := reader.ReadString('\n')
-		value = strings.TrimSpace(value)
 
 		err = addProtectedValue(key, value, bucket)
 		if err != nil {
 			return err
 		}
-		fmt.Printf(`Added '%s' with protect value`+"\n", key)
+		fmt.Printf(`Added '%s' with protected value`+"\n", key)
 		return nil
 	})
 	if err != nil {

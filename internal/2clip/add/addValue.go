@@ -46,25 +46,22 @@ func commandAdd(key string) {
 	db, _ := database.OpenDatabase("2clip.db", "2clip")
 	defer db.Close()
 
-	addToDatabase(db, key)
+	key, err := overwrite(db, key)
+	if err != nil {
+		fmt.Errorf("overwrite failed: %v", err)
+		os.Exit(0)
+	}
+
+	input := GetInput()
+	addToDatabase(db, key, input)
 }
 
-func addToDatabase(db *bolt.DB, key string) {
+func addToDatabase(db *bolt.DB, key string, value string) {
 	err := db.Update(func(tx *bolt.Tx) error {
 		bucket, err := util.ConnectToBucket(tx, "2clip")
 		if err != nil {
 			return err
 		}
-
-		key, err = overwrite(db, key)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println("Input value:")
-		reader := bufio.NewReader(os.Stdin)
-		value, _ := reader.ReadString('\n')
-		value = strings.TrimSpace(value)
 
 		err = bucket.Put([]byte(key), []byte(value))
 		if err != nil {
@@ -72,9 +69,9 @@ func addToDatabase(db *bolt.DB, key string) {
 		}
 
 		if strings.HasSuffix(key, " (protected)") {
-			fmt.Printf(`Added "%s" with protect value`+"\n", key)
+			fmt.Printf(`Added "%s" successfully with protected value`+"\n", key)
 		} else {
-			fmt.Printf(`Added "%s" with value "%s"`+"\n", key, value)
+			fmt.Printf(`Added "%s" successfully`+"\n", key)
 		}
 		return nil
 	})
@@ -106,4 +103,13 @@ func getOverwriteAnswer(key string) {
 	fmt.Printf(`key '%s' already exists, you want to overwrite it? [Y/N]: `, key)
 
 	util.AnswerCondition()
+}
+
+func GetInput() string {
+	fmt.Println("Input value:")
+	reader := bufio.NewReader(os.Stdin)
+	value, _ := reader.ReadString('\n')
+	value = strings.TrimSpace(value)
+
+	return value
 }
