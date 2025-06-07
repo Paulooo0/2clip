@@ -22,58 +22,59 @@
 
 <h2 id="how-to-use">How to use</h2>
 
-### Main commands
-#### add - adds a new key-value pair to the database
+### Commands
+**Add** - adds a new key-value pair to the database
 ```bash
-2clip add "My key" "My value"
+2clip add "My key"
 ```
-* Use `add -p` to add protected keys, that can only be accessed using authentication
-* You can use `'` or `"` to add values with spaces
-The terminal will be open to be inserted your input for the key `My key`, in this exemple, we will input `My value` to be value associated with this key
-```bash
-My value
-```
-#### get - adds to your clipboard the value of your provided key
+* Shorthand: `a`
+* Arguments:
+  * Extended: `-e` or `--extended`. Activates multiline input mode
+  * Protected: `-p` or `protected`. Protects throught authentication to get the value of the key
+* You can use `'` or `"` to add values with spaces. The terminal will enter in input mode to receive your key value, and then store it in database.
+
+**Get** - adds to your clipboard the value of your provided key
 ```bash
 2clip get "My key"
 ```
-* You can also use the index of the key using the argument `-i`, if the index of this key is `1`, so the command is:
-```bash
-2clip get -i 1
-```
-Output:
-```bash
-My value
-Value copied to clipboard
-```
+* Shorthand: `g`
+* Arguments:
+  * Index: `-i` or `--index`. Searches by index in `list command`, example: `2clip g -i 5`. Will get the value of 5th element in `2clip ls`
+* If the key is `protected`, then `get` command will require your password to access the value
 
-#### list - lists all keys alphabetically sorted, and its own index
+**List** - lists all keys alphabetically sorted, and its own index
 ```bash
 2clip list
-```
-Output:
-```bash
-A
-[1] akey
 
-B
-[2] bkey
+➜  A
+1 a-key
+
+➜  B
+2 b-key
+
+➜  C
+3 c-key 🔒
 ```
----
-### Other commands
-#### auth - allows you to create a password
+* Shorthand: `ls`
+
+**Auth** - manages your authentication
 ```bash
 2clip auth
 ```
-* use `auth -u` to update your actual password
-#### remove - removes a key-pair value from the database
+* Arguments:
+  * Update: `-u` or `--update` updates your current password
+
+**Remove** - removes a key-pair value from the database
 ```bash
 2clip remove "My key"
 ```
+* Shorthand: `rm`
+* Arguments:
+  * Index: `-i` or `--index`. Searches by index in `list command`, example: `2clip rm -i 5`. Will remove the 5th element in `2clip ls`
 
 <h2 id="use-cases">Use cases</h2>
 
-* Store passwords securely, using `add -p` (protected value)
+* Store passwords securely
 * Use as flash cards for studies
 * Useful for store both important and disposable informations, since is easy and quick to add or remove then
 
