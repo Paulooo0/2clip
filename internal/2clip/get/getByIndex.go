@@ -35,7 +35,8 @@ func readIndexValue(db *bolt.DB, index string) {
 		}
 
 		if idx < 0 || idx >= len(keys) {
-			return fmt.Errorf("index out of range: %d", idx+1)
+			fmt.Printf("%s Index out of range: %d\n", util.Err, idx+1)
+			return err
 		}
 
 		key := keys[idx]
@@ -50,7 +51,7 @@ func readIndexValue(db *bolt.DB, index string) {
 func parseAndValidateIndex(index string) (int, error) {
 	idx, err := strconv.Atoi(index)
 	if err != nil {
-		return 0, fmt.Errorf("invalid index: %s", index)
+		return 0, fmt.Errorf("%s Invalid index: %s", util.Err, index)
 	}
 	return idx - 1, nil
 }
@@ -58,7 +59,7 @@ func parseAndValidateIndex(index string) (int, error) {
 func processKeyValue(bucket *bolt.Bucket, key string, db *bolt.DB) error {
 	value := bucket.Get([]byte(key))
 	if value == nil {
-		return fmt.Errorf("key '%s' not found", key)
+		return fmt.Errorf("%s Key \033[33m"+"%s"+"\033[0m not found", util.Err, key)
 	}
 
 	if strings.HasSuffix(key, " (protected)") {

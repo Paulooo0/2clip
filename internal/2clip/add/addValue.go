@@ -17,8 +17,8 @@ import (
 var AddCmd = &cobra.Command{
 	Use:        "add",
 	Aliases:    []string{"a"},
-	ValidArgs:  []string{"-p"},
-	ArgAliases: []string{"-p"},
+	ValidArgs:  []string{"-p", "-e"},
+	ArgAliases: []string{"-p", "-e"},
 	Short:      "Add a key-value to database",
 	Long:       "Add a value by input to database, linked to the provided key.",
 	Example: `
@@ -28,43 +28,43 @@ var AddCmd = &cobra.Command{
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		key := args[0]
+		var input string
 
-		if cmd.Flags().NFlag() == 0 {
-			commandAdd(key)
-		}
+		db, _ := database.OpenDatabase("2clip.db", "2clip")
+		defer db.Close()
+
 		if (cmd.Flags().Changed("protected")) || (cmd.Flags().Changed("p")) {
-			CommandAddProtected(key)
+			key = key + " (protected)"
 		}
+
+		key, err := overwrite(db, key)
+		if err != nil {
+			fmt.Printf("%s Overwrite failed: %v", util.Err, err)
+			os.Exit(0)
+		}
+
+		if (cmd.Flags().NFlag() == 0) || ((cmd.Flags().NFlag() == 1 && cmd.Flags().Changed("protected")) || (cmd.Flags().Changed("p"))) {
+			input = GetInput()
+		}
+		if cmd.Flags().Changed("extended") || cmd.Flags().Changed("e") {
+			input = GetExtendedInput()
+		}
+
+		addToDatabase(key, input, db, "2clip")
 	},
 }
 
 func AddCmdFlags() {
 	AddCmd.Flags().BoolP("protected", "p", false, "Add a protected value to the database")
+	AddCmd.Flags().BoolP("extended", "e", false, "Add a multiline value to the database using the END word as delimiter")
 }
 
-func commandAdd(key string) {
-	db, _ := database.OpenDatabase("2clip.db", "2clip")
-	defer db.Close()
-
-	addToDatabase(db, key)
-}
-
-func addToDatabase(db *bolt.DB, key string) {
+func addToDatabase(key string, value string, db *bolt.DB, bucketName string) {
 	err := db.Update(func(tx *bolt.Tx) error {
-		bucket, err := util.ConnectToBucket(tx, "2clip")
+		bucket, err := util.ConnectToBucket(tx, bucketName)
 		if err != nil {
 			return err
 		}
-
-		key, err = overwrite(db, key)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println("Input value:")
-		reader := bufio.NewReader(os.Stdin)
-		value, _ := reader.ReadString('\n')
-		value = strings.TrimSpace(value)
 
 		err = bucket.Put([]byte(key), []byte(value))
 		if err != nil {
@@ -72,38 +72,51 @@ func addToDatabase(db *bolt.DB, key string) {
 		}
 
 		if strings.HasSuffix(key, " (protected)") {
-			fmt.Printf(`Added "%s" with protect value`+"\n", key)
+			fmt.Printf("Added \033[94m"+"%s"+"\033[0m 🔒 with protected value\n", key[:len(key)-12])
 		} else {
-			fmt.Printf(`Added "%s" with value "%s"`+"\n", key, value)
+			fmt.Printf("Added \033[33m"+"%s"+"\033[0m successfully\n", key)
 		}
 		return nil
 	})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("%s %v", util.Err, err)
 	}
 }
 
 func overwrite(db *bolt.DB, key string) (string, error) {
-	if util.CheckKeyAlreadyExists(key, db, "2clip") {
-		getOverwriteAnswer(key)
-
-		return key, nil
-	}
 	if util.CheckKeyAlreadyExists(key+" (protected)", db, "2clip") {
+		key = key + " (protected)"
 		getOverwriteAnswer(key)
 
 		err := util.Authenticate(db)
 		if err != nil {
 			return "", err
 		}
-		key = key + " (protected)"
+		return key, nil
+	}
+	if util.CheckKeyAlreadyExists(key, db, "2clip") {
+		getOverwriteAnswer(key)
+
 		return key, nil
 	}
 	return key, nil
 }
 
 func getOverwriteAnswer(key string) {
-	fmt.Printf(`key '%s' already exists, you want to overwrite it? [Y/N]: `, key)
+	if strings.HasSuffix(key, " (protected)") {
+		fmt.Printf("Key \033[94m"+"%s 🔒"+"\033[0m already exists, you want to overwrite it? [Y/N]: ", key[:len(key)-12])
+	} else {
+		fmt.Printf("Key \033[33m"+"%s"+"\033[0m already exists, you want to overwrite it? [Y/N]: ", key)
+	}
 
-	util.AnswerCondition()
+	util.AskTryAgain(false)
+}
+
+func GetInput() string {
+	fmt.Println("Input value:")
+	reader := bufio.NewReader(os.Stdin)
+	value, _ := reader.ReadString('\n')
+	value = strings.TrimSpace(value)
+
+	return value
 }

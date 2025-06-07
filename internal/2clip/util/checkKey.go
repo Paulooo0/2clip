@@ -18,8 +18,8 @@ func CheckKeyAlreadyExists(key string, db *bolt.DB, bucketName string) bool {
 		return nil
 	})
 	if err != nil {
-		log.Fatal(err)
-		return exists == false
+		log.Fatalf("%s %v", Err, err)
+		return !exists
 	}
-	return exists == true
+	return exists
 }

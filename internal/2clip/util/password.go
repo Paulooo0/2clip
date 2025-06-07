@@ -2,7 +2,6 @@ package util
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/boltdb/bolt"
 )
@@ -11,10 +10,10 @@ func ValidatePassword(password string) bool {
 	condition := true
 	for condition {
 		if len(password) < 1 {
-			fmt.Println("Password cannot be empty")
-			return condition == TryAgain()
+			fmt.Println("Password can't be empty")
+			return condition == AskTryAgain(true)
 		} else {
-			return condition == false
+			return !condition
 		}
 	}
 	return condition
@@ -30,12 +29,12 @@ func CheckPassword(db *bolt.DB, password string) error {
 		value := authBucket.Get([]byte("2CLIP_PASSWORD"))
 
 		if password != string(value) {
-			return fmt.Errorf("Wrong password!")
+			return fmt.Errorf("%s %v", Err, err)
 		}
 		return nil
 	})
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("%s %v", Err, err)
 	}
 	return nil
 }

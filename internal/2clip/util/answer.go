@@ -5,16 +5,10 @@ import (
 	"os"
 )
 
-func AnswerCondition() bool {
-	answerCondition := true
-	for answerCondition {
-		answerCondition = getAnswer()
+func AskTryAgain(askQuestion bool) bool {
+	if askQuestion {
+		fmt.Print("\nDo you want to try again? [Y/N]: ")
 	}
-	return true
-}
-
-func TryAgain() bool {
-	fmt.Print("\nDo you want to try again? [Y/N]: ")
 	answerCondition := true
 	for answerCondition {
 		answerCondition = getAnswer()

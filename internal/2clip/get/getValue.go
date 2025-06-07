@@ -66,7 +66,7 @@ func readValue(db *bolt.DB, key string) {
 			value = bucket.Get([]byte(key))
 			keyString = key
 			if value == nil {
-				return fmt.Errorf(`key '%s' not found`, key)
+				return fmt.Errorf(`%s Key '%s' not found`, util.Err, key)
 			}
 		}
 
@@ -75,7 +75,7 @@ func readValue(db *bolt.DB, key string) {
 		return nil
 	})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("%s %v", util.Err, err)
 	}
 }
 
@@ -83,17 +83,17 @@ func copyToClipboard(keyString string, value []byte) {
 	if strings.HasSuffix(keyString, " (protected)") {
 		err := clipboard.WriteAll(string(value))
 
-		fmt.Printf(`"%s" protected value copied to clipboard`, keyString[:len(keyString)-12])
+		fmt.Printf("\033[94m"+"%s 🔒"+"\033[0m protected value copied to clipboard", keyString[:len(keyString)-12])
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("%s %v", util.Err, err)
 		}
 	} else {
 		fmt.Println(string(value))
 
 		err := clipboard.WriteAll(string(value))
-		fmt.Println("Value copied to clipboard")
+		fmt.Printf("\033[33m"+"%s"+"\033[0m value copied to clipboard", keyString)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("%s %v", util.Err, err)
 		}
 	}
 }
