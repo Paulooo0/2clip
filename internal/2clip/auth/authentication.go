@@ -58,14 +58,15 @@ func checkAlreadyHaveAuth(db *bolt.DB) error {
 }
 
 func getPassword() string {
-	password := enterPassword()
-	passwordAgain := enterPasswordAgain()
+	var password string
 
-	err := matchPassword(password, passwordAgain)
-	if err != nil {
-		fmt.Println(err)
-		fmt.Println("Run '2clip auth' to try again")
-		os.Exit(0)
+	condition := true
+	for condition {
+		password = enterPassword()
+		passwordAgain := enterPasswordAgain()
+
+		err := matchPassword(password, passwordAgain)
+		condition = matchLoop(err)
 	}
 
 	return password
@@ -73,6 +74,7 @@ func getPassword() string {
 
 func enterPassword() string {
 	var password string
+
 	condition := true
 	for condition {
 		fmt.Print("Enter your password: ")
@@ -91,26 +93,25 @@ func enterPasswordAgain() string {
 	fmt.Print("Enter your password again: ")
 
 	var passwordAgain string
-	fmt.Println("\033[8m")
+	fmt.Print("\033[8m")
 	fmt.Scanln(&passwordAgain)
-	fmt.Println("\033[28m")
+	fmt.Print("\033[28m")
 
 	return passwordAgain
 }
 
 func matchPassword(password1 string, password2 string) error {
 	if password1 != password2 {
-		return fmt.Errorf("Passwords do not match!")
+		return fmt.Errorf("%s Passwords don't match", util.Err)
 	}
 	return nil
 }
 
-func validateAuth(db *bolt.DB, password string) {
-	err := db.Update(func(tx *bolt.Tx) error {
-		util.ValidatePassword(password)
-		return nil
-	})
+func matchLoop(err error) bool {
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		util.AskTryAgain(true)
+		return true
 	}
+	return false
 }

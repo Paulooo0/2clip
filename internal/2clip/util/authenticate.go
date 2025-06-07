@@ -19,18 +19,18 @@ func SaveAuthentication(db *bolt.DB, password string) {
 		if err != nil {
 			return err
 		}
-		fmt.Println("Authentication saved")
+		fmt.Println("\033[1m\033[0m\033[32m" + "Authentication saved" + "\033[0m")
 		return nil
 	})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("%s %v", Err, err)
 	}
 }
 
 func Authenticate(db *bolt.DB) error {
 	condition := true
 	for condition {
-		fmt.Print("\nEnter your password: ")
+		fmt.Print("Enter your password: ")
 
 		bytePassword, err := term.ReadPassword(int(syscall.Stdin))
 		if err != nil {
@@ -41,7 +41,6 @@ func Authenticate(db *bolt.DB) error {
 
 		err = CheckPassword(db, password)
 		if err != nil {
-			condition = true
 			isAuthenticationFailed(condition)
 		} else {
 			condition = false
@@ -53,10 +52,10 @@ func Authenticate(db *bolt.DB) error {
 
 func isAuthenticationFailed(condition bool) {
 	if condition {
-		fmt.Println("\nAuthentication failed!")
+		fmt.Println("\n\033[1m\033[0m\033[31m" + "Authentication failed!" + "\033[0m")
 		fmt.Println("TIP: if you don't have a password, run '2clip auth' to create one")
-
+		AskTryAgain(true)
 	} else {
-		fmt.Println("\nAuthentication successful!")
+		fmt.Println("\n\033[1m\033[0m\033[32m" + "Successfully authenticated!" + "\033[0m")
 	}
 }

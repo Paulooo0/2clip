@@ -5,18 +5,20 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/Paulooo0/2clip/internal/2clip/util"
 )
 
 func GetExtendedInput() string {
-	fmt.Println("Enter your text (type 'END' on a new line to finish):")
+	fmt.Println("Enter your text (type \033[33mEND\033[0m on a new line to finish):")
 	reader := bufio.NewReader(os.Stdin)
 	var lines []string
 
 	for {
 		line, err := reader.ReadString('\n')
 		if err != nil {
-			fmt.Println("Error reading input:", err)
-			os.Exit(1)
+			fmt.Printf("%s Error reading input: %v", util.Err, err)
+			os.Exit(0)
 		}
 
 		line = strings.TrimSpace(line)

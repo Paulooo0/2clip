@@ -39,7 +39,7 @@ var AddCmd = &cobra.Command{
 
 		key, err := overwrite(db, key)
 		if err != nil {
-			log.Printf("overwrite failed: %v", err)
+			fmt.Printf("%s Overwrite failed: %v", util.Err, err)
 			os.Exit(0)
 		}
 
@@ -79,33 +79,37 @@ func addToDatabase(key string, value string, db *bolt.DB, bucketName string) {
 		return nil
 	})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("%s %v", util.Err, err)
 	}
 }
 
 func overwrite(db *bolt.DB, key string) (string, error) {
-	if util.CheckKeyAlreadyExists(key, db, "2clip") {
-		getOverwriteAnswer(key)
-
-		return key, nil
-	}
 	if util.CheckKeyAlreadyExists(key+" (protected)", db, "2clip") {
+		key = key + " (protected)"
 		getOverwriteAnswer(key)
 
 		err := util.Authenticate(db)
 		if err != nil {
 			return "", err
 		}
-		key = key + " (protected)"
+		return key, nil
+	}
+	if util.CheckKeyAlreadyExists(key, db, "2clip") {
+		getOverwriteAnswer(key)
+
 		return key, nil
 	}
 	return key, nil
 }
 
 func getOverwriteAnswer(key string) {
-	fmt.Printf("key \033[33m"+"%s"+"\033[0m already exists, you want to overwrite it? [Y/N]: ", key)
+	if strings.HasSuffix(key, " (protected)") {
+		fmt.Printf("Key \033[94m"+"%s 🔒"+"\033[0m already exists, you want to overwrite it? [Y/N]: ", key[:len(key)-12])
+	} else {
+		fmt.Printf("Key \033[33m"+"%s"+"\033[0m already exists, you want to overwrite it? [Y/N]: ", key)
+	}
 
-	util.AnswerCondition()
+	util.AskTryAgain(false)
 }
 
 func GetInput() string {

@@ -43,7 +43,7 @@ func listKeys(db *bolt.DB) {
 		return nil
 	})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("%s %v", util.Err, err)
 	}
 }
 

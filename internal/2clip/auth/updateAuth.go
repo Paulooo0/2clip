@@ -54,7 +54,7 @@ func enterPasswords(db *bolt.DB) (string, string) {
 }
 
 func getOldPassword() string {
-	fmt.Print("Enter your actual password: ")
+	fmt.Print("Enter your current password: ")
 
 	var oldPassword string
 	fmt.Print("\033[8m")
