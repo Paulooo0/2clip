@@ -28,36 +28,35 @@ var AddCmd = &cobra.Command{
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		key := args[0]
+		var input string
 
-		if cmd.Flags().NFlag() == 0 {
-			commandAdd(key)
-		}
+		db, _ := database.OpenDatabase("2clip.db", "2clip")
+		defer db.Close()
+
 		if (cmd.Flags().Changed("protected")) || (cmd.Flags().Changed("p")) {
-			CommandAddProtected(key)
+			key = key + " (protected)"
+		}
+
+		key, err := overwrite(db, key)
+		if err != nil {
+			log.Printf("overwrite failed: %v", err)
+			os.Exit(0)
+		}
+
+		if (cmd.Flags().NFlag() == 0) || ((cmd.Flags().NFlag() == 1 && cmd.Flags().Changed("protected")) || (cmd.Flags().Changed("p"))) {
+			input = GetInput()
 		}
 		if cmd.Flags().Changed("extended") || cmd.Flags().Changed("e") {
-			CommandAddExtended(key)
+			input = GetExtendedInput()
 		}
+
+		addToDatabase(key, input, db, "2clip")
 	},
 }
 
 func AddCmdFlags() {
 	AddCmd.Flags().BoolP("protected", "p", false, "Add a protected value to the database")
 	AddCmd.Flags().BoolP("extended", "e", false, "Add a multiline value to the database using the END word as delimiter")
-}
-
-func commandAdd(key string) {
-	db, _ := database.OpenDatabase("2clip.db", "2clip")
-	defer db.Close()
-
-	key, err := overwrite(db, key)
-	if err != nil {
-		log.Printf("overwrite failed: %v", err)
-		os.Exit(0)
-	}
-
-	input := GetInput('\n')
-	addToDatabase(key, input, db, "2clip")
 }
 
 func addToDatabase(key string, value string, db *bolt.DB, bucketName string) {
@@ -73,9 +72,9 @@ func addToDatabase(key string, value string, db *bolt.DB, bucketName string) {
 		}
 
 		if strings.HasSuffix(key, " (protected)") {
-			fmt.Printf(`Added "%s" successfully with protected value`+"\n", key)
+			fmt.Printf("Added \033[94m"+"%s"+"\033[0m 🔒 with protected value\n", key[:len(key)-12])
 		} else {
-			fmt.Printf(`Added "%s" successfully`+"\n", key)
+			fmt.Printf("Added \033[33m"+"%s"+"\033[0m successfully\n", key)
 		}
 		return nil
 	})
@@ -104,15 +103,15 @@ func overwrite(db *bolt.DB, key string) (string, error) {
 }
 
 func getOverwriteAnswer(key string) {
-	fmt.Printf(`key '%s' already exists, you want to overwrite it? [Y/N]: `, key)
+	fmt.Printf("key \033[33m"+"%s"+"\033[0m already exists, you want to overwrite it? [Y/N]: ", key)
 
 	util.AnswerCondition()
 }
 
-func GetInput(delim byte) string {
+func GetInput() string {
 	fmt.Println("Input value:")
 	reader := bufio.NewReader(os.Stdin)
-	value, _ := reader.ReadString(delim)
+	value, _ := reader.ReadString('\n')
 	value = strings.TrimSpace(value)
 
 	return value

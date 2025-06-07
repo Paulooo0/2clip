@@ -53,12 +53,12 @@ func printSortedKeys(keys []string) {
 	}
 
 	prevLetter := strings.ToUpper(string(keys[0][0]))
-	fmt.Printf("\n\033[1m"+"\033[32m"+"➜ "+"\033[0m"+"\033[1m"+"%s"+"\033[0m\n", prevLetter)
+	fmt.Printf("\n\033[1m"+"\033[32m"+"➜  "+"\033[0m"+"\033[1m"+"%s"+"\033[0m\n", prevLetter)
 
 	for i, key := range keys {
 		letter := strings.ToUpper(string(key[0]))
 		if letter != prevLetter {
-			fmt.Printf("\n\033[1m"+"\033[32m"+"➜ "+"\033[0m"+"\033[1m"+"%s"+"\033[0m\n", letter)
+			fmt.Printf("\n\033[1m"+"\033[32m"+"➜  "+"\033[0m"+"\033[1m"+"%s"+"\033[0m\n", letter)
 			prevLetter = letter
 		}
 		if strings.HasSuffix(key, " (protected)") {
