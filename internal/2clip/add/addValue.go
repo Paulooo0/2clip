@@ -17,8 +17,8 @@ import (
 var AddCmd = &cobra.Command{
 	Use:        "add",
 	Aliases:    []string{"a"},
-	ValidArgs:  []string{"-p"},
-	ArgAliases: []string{"-p"},
+	ValidArgs:  []string{"-p", "-e"},
+	ArgAliases: []string{"-p", "-e"},
 	Short:      "Add a key-value to database",
 	Long:       "Add a value by input to database, linked to the provided key.",
 	Example: `
@@ -35,11 +35,15 @@ var AddCmd = &cobra.Command{
 		if (cmd.Flags().Changed("protected")) || (cmd.Flags().Changed("p")) {
 			CommandAddProtected(key)
 		}
+		if cmd.Flags().Changed("extended") || cmd.Flags().Changed("e") {
+			CommandAddExtended(key)
+		}
 	},
 }
 
 func AddCmdFlags() {
 	AddCmd.Flags().BoolP("protected", "p", false, "Add a protected value to the database")
+	AddCmd.Flags().BoolP("extended", "e", false, "Add a multiline value to the database using the END word as delimiter")
 }
 
 func commandAdd(key string) {
@@ -48,17 +52,17 @@ func commandAdd(key string) {
 
 	key, err := overwrite(db, key)
 	if err != nil {
-		fmt.Errorf("overwrite failed: %v", err)
+		log.Printf("overwrite failed: %v", err)
 		os.Exit(0)
 	}
 
-	input := GetInput()
-	addToDatabase(db, key, input)
+	input := GetInput('\n')
+	addToDatabase(key, input, db, "2clip")
 }
 
-func addToDatabase(db *bolt.DB, key string, value string) {
+func addToDatabase(key string, value string, db *bolt.DB, bucketName string) {
 	err := db.Update(func(tx *bolt.Tx) error {
-		bucket, err := util.ConnectToBucket(tx, "2clip")
+		bucket, err := util.ConnectToBucket(tx, bucketName)
 		if err != nil {
 			return err
 		}
@@ -105,10 +109,10 @@ func getOverwriteAnswer(key string) {
 	util.AnswerCondition()
 }
 
-func GetInput() string {
+func GetInput(delim byte) string {
 	fmt.Println("Input value:")
 	reader := bufio.NewReader(os.Stdin)
-	value, _ := reader.ReadString('\n')
+	value, _ := reader.ReadString(delim)
 	value = strings.TrimSpace(value)
 
 	return value

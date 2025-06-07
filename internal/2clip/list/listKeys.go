@@ -13,9 +13,13 @@ import (
 )
 
 var ListKeysCmd = &cobra.Command{
-	Use:   "list",
-	Short: "List all keys in the database",
-	Long:  `List all keys in the database.`,
+	Use:     "list",
+	Short:   "List all keys in the database",
+	Aliases: []string{"ls"},
+	Long:    `List all keys in the database.`,
+	Example: `
+	2clip ls
+	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		db, _ := database.OpenDatabase("2clip.db", "2clip")
 		defer db.Close()

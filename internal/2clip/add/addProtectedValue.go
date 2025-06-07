@@ -17,19 +17,19 @@ func CommandAddProtected(key string) {
 
 	key, err := overwrite(db, key)
 	if err != nil {
-		fmt.Errorf("overwrite failed: %v", err)
+		log.Printf("overwrite failed: %v", err)
 		os.Exit(0)
 	}
 
-	input := GetInput()
+	input := GetInput('\n')
 	addProtectedToDatabase(db, key, input)
 }
 
 func addProtectedToDatabase(db *bolt.DB, key string, value string) {
 	err := db.Update(func(tx *bolt.Tx) error {
 		bucket, err := util.ConnectToBucket(tx, "2clip")
-		if bucket == nil {
-			return fmt.Errorf("bucket 2clip not found")
+		if err != nil {
+			log.Print("bucket 2clip not found")
 		}
 
 		err = addProtectedValue(key, value, bucket)
@@ -52,4 +52,6 @@ func addProtectedValue(key string, value string, bucket *bolt.Bucket) error {
 		err := bucket.Put([]byte(key+" (protected)"), []byte(value))
 		return err
 	}
+
+	// TODO: Change sufix to a boolean value
 }
