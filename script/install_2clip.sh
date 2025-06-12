@@ -36,4 +36,4 @@ chmod +x "$BINARY"
 
 # Move the binary to /usr/local/bin (Linux/macOS) or another directory in PATH
 sudo mv "$BINARY" /usr/local/bin/2clip
-echo "2clip v$VERSION installed to /usr/local/bin/2clip"
+echo "2clip v$VERSION installed successfully!"
